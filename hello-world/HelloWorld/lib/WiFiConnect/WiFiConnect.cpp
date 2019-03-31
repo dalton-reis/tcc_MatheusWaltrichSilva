@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include <FS.h>
 #include <ESP8266WiFi.h>
+#include "user_interface.h"
 
 WiFiServer server(80);
 const char* ssid = "Aquario";
 const char* password = "aquario-virtual";
 String HTML_PAGE = "";
+String connectionType;
 
 void loadHTML() {
   HTML_PAGE = "<html>";
@@ -59,7 +61,11 @@ String getConfigFromPage(String parameter) {
   return "";
 }
 
-void createWebPage() {  
+void callback() {
+  
+}
+
+void createWebServer(void (*callback)) {  
   WiFiClient client = server.available();
   if (!client) {
     return;
@@ -87,6 +93,8 @@ void createWebPage() {
     }
   } else if (req.indexOf("format=true") >= 0) {
     SPIFFS.format();
+  } else {
+    callback();
   }
 }
 
@@ -115,6 +123,10 @@ boolean connectWiFi(String wifiConfig) {
   return WiFi.status() == WL_CONNECTED;
 }
 
+String getConnectionType() {
+  return connectionType;
+}
+
 void start() {  
   SPIFFS.begin();
   loadHTML();
@@ -123,14 +135,18 @@ void start() {
   if (wifiConfig.length() == 0) {
     Serial.println("Arquivo vazio ou não encontrado");
     connectAccessPoint();
+    connectionType = "AP";
   } else {
     Serial.println("Arquivo configurado");
     if (!connectWiFi(wifiConfig)) {
       Serial.println("Não foi possível conectar no WiFi");
       connectAccessPoint();
+      connectionType = "AP";
     } else {
+      wifi_set_sleep_type(NONE_SLEEP_T);
       Serial.println(WiFi.localIP());
       server.begin();
+      connectionType = "STA";
     }
   }
 }

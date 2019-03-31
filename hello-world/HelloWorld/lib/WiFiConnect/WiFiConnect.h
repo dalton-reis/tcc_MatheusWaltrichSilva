@@ -1,2 +1,3 @@
 void start();
-void createWebPage();
+void createWebServer();
+String getConnectionType();
