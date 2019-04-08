@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "UDPConn.h"
-#include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <ESP8266WiFi.h>
 
 #define BUFFER_LENGTH 256
 
@@ -27,11 +27,7 @@ String UDPConn::getRemoteIP() {
   return remoteIP;
 }
 
-void UDPConn::listeningMulticast() {
-  this->listeningMulticast(false);
-}
-
-void UDPConn::listeningMulticast(bool log) {
+void UDPConn::listeningMulticast(bool log /* = false*/) {
   int packetLength = UDP.parsePacket(); 
   if (packetLength > 0) {
     int len = UDP.read(incomingPacket, BUFFER_LENGTH);

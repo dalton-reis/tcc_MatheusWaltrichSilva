@@ -13,8 +13,7 @@ class UDPConn {
   public:
     UDPConn();
     void startMulticast(int ipPart01, int ipPart02, int ipPart03, int ipPart04, unsigned int multicastPort);
-    void listeningMulticast(bool log);
-    void listeningMulticast();
+    void listeningMulticast(bool log = false);
     char* getMulticastPacket();
     String getRemoteIP();
 };
