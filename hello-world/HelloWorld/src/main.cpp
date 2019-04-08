@@ -1,22 +1,27 @@
 #include <Arduino.h>
 #include <WiFiConnect.h>
-#include <MulticastConn.h>
+#include <UDPConn.h>
 
-//VIVO-52C0|Td9VYk7m3W
-
+//VIVO-52C0|Td9VYk7m3W 
+WiFiConnect wifiConn;
+UDPConn udpConn;
 unsigned int multicastPort = 5000;
 
 void setup() {
   Serial.begin(9600);
-  start();
-  if (getConnectionType() == "STA") {
-    startMulticast(227, 55, 77, 99, multicastPort);
+  wifiConn.start();
+  if (wifiConn.getConnectionType() == "STA") {
+    udpConn.startMulticast(227, 55, 77, 99, multicastPort);
   }
 }
 
+void test(String req) {
+  Serial.println("Callback message: " + req);
+}
+
 void loop() {
-  createWebServer();
-  if (getConnectionType() == "STA") {
-    listeningMulticast();
+  wifiConn.createWebServer(&test);
+  if (wifiConn.getConnectionType() == "STA") {
+    udpConn.listeningMulticast();
   }
 }

@@ -1,7 +1,8 @@
 #include <Arduino.h>
+#include "WiFiConnect.h"
 #include <FS.h>
 #include <ESP8266WiFi.h>
-#include "user_interface.h"
+#include <user_interface.h>
 
 WiFiServer server(80);
 const char* ssid = "Aquario";
@@ -9,7 +10,11 @@ const char* password = "aquario-virtual";
 String HTML_PAGE = "";
 String connectionType;
 
-void loadHTML() {
+WiFiConnect::WiFiConnect() {
+
+}
+  
+void WiFiConnect::loadHTML() {
   HTML_PAGE = "<html>";
   HTML_PAGE +=  "<head>";
   HTML_PAGE +=    "<title>Aquário Virtual - Configurações</title>";  
@@ -25,8 +30,8 @@ void loadHTML() {
   HTML_PAGE +=  "</body>";
   HTML_PAGE +="</html>";
 }
-       
-String readFile(String file) {
+      
+String WiFiConnect::readFile(String file) {
   File readFile = SPIFFS.open(file, "r");
   if (!readFile) {
     Serial.println("Erro ao abrir arquivo!");
@@ -37,7 +42,7 @@ String readFile(String file) {
   return content;
 }
 
-void writeFile(String content, String file) {
+void WiFiConnect::writeFile(String content, String file) {
   File writeFile = SPIFFS.open(file, "w+");
   if (!writeFile) {
     Serial.println("Erro ao gravar arquivo.");    
@@ -48,7 +53,7 @@ void writeFile(String content, String file) {
   writeFile.close();
 }
 
-String getConfigFromPage(String parameter) {
+String WiFiConnect::getConfigFromPage(String parameter) {
   String parameterSSID = "";
   String parameterPWD = "";
   parameterSSID = parameter.substring(0, parameter.indexOf("&"));
@@ -61,11 +66,36 @@ String getConfigFromPage(String parameter) {
   return "";
 }
 
-void callback() {
-  
+void WiFiConnect::connectAccessPoint() {
+  WiFi.mode(WIFI_AP);  
+  WiFi.softAP(ssid, password);   
+  server.begin();
+  Serial.println(WiFi.softAPIP());
 }
 
-void createWebServer(void (*callback)) {  
+boolean WiFiConnect::connectWiFi(String wifiConfig) {    
+  WiFi.mode(WIFI_STA);  
+  String wifiStr = wifiConfig.substring(0, wifiConfig.indexOf("|"));
+  wifiStr.trim();
+  String pwdStr = wifiConfig.substring(wifiConfig.indexOf("|")+1);
+  pwdStr.trim();  
+  WiFi.begin(wifiStr, pwdStr);
+  Serial.println("SSID arquivo: " + wifiStr);
+  Serial.println("Password arquivo: " + pwdStr);
+  int tries = 0;
+  while (tries < 10 && WiFi.status() != WL_CONNECTED) {
+    delay(3000);
+    WiFi.begin(wifiStr, pwdStr);
+    tries++;
+  }
+  return WiFi.status() == WL_CONNECTED;
+}    
+
+String WiFiConnect::getConnectionType() {
+  return connectionType;
+}
+
+void WiFiConnect::createWebServer(void (*callback)(String request)) {  
   WiFiClient client = server.available();
   if (!client) {
     return;
@@ -94,40 +124,11 @@ void createWebServer(void (*callback)) {
   } else if (req.indexOf("format=true") >= 0) {
     SPIFFS.format();
   } else {
-    callback();
+    callback(req);
   }
 }
 
-void connectAccessPoint() {
-  WiFi.mode(WIFI_AP);  
-  WiFi.softAP(ssid, password);   
-  server.begin();
-  Serial.println(WiFi.softAPIP());
-}
-
-boolean connectWiFi(String wifiConfig) {    
-  WiFi.mode(WIFI_STA);  
-  String wifiStr = wifiConfig.substring(0, wifiConfig.indexOf("|"));
-  wifiStr.trim();
-  String pwdStr = wifiConfig.substring(wifiConfig.indexOf("|")+1);
-  pwdStr.trim();  
-  WiFi.begin(wifiStr, pwdStr);
-  Serial.println("SSID arquivo: " + wifiStr);
-  Serial.println("Password arquivo: " + pwdStr);
-  int tries = 0;
-  while (tries < 10 && WiFi.status() != WL_CONNECTED) {
-    delay(3000);
-    WiFi.begin(wifiStr, pwdStr);
-    tries++;
-  }
-  return WiFi.status() == WL_CONNECTED;
-}
-
-String getConnectionType() {
-  return connectionType;
-}
-
-void start() {  
+void WiFiConnect::start() {  
   SPIFFS.begin();
   loadHTML();
   String wifiConfig = readFile("/wifi-config.txt");
@@ -150,4 +151,3 @@ void start() {
     }
   }
 }
-
