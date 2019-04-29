@@ -7,20 +7,21 @@
 #define WiFiConnect_h
 
 #include <Arduino.h>
+#include <ESP8266WebServer.h>
 
 class WiFiConnect {
-  public:
+  public:    
     WiFiConnect();
-    void start(const char* APssid, const char* APpwd);
-    void createWebServer(void (*callback)(String request));
-    String getConnectionType();
-  private:
-    void loadHTML();
+    void handleWebServer();
+    void start(const char* APssid, const char* APpwd);  
+    String getConnectionType();    
+  private:        
     String readFile(String file);
     void writeFile(String content, String file);
     String getConfigFromPage(String parameter);
     void connectAccessPoint(const char* APssid, const char* APpwd);
     boolean connectWiFi(String wifiConfig);
+    void webServer();
 };
 
 #endif

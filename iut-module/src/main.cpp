@@ -1,32 +1,31 @@
 #include <Arduino.h>
-#include <WiFiConnect.h>
-#include <UDPConn.h>
+#include <IUTHTTP.h>
 
 //VIVO-52C0|Td9VYk7m3W 
-WiFiConnect wifiConn;
-UDPConn udpConn;
+IUTHTTP IUTConn;
 unsigned int multicastPort = 5000;
-const char* ssid = "Aquario";
-const char* password = "aquario-virtual";
+char* ssid = "Aquario";
+char* password = "aquario-virtual";
+char* tokenID = "AQUARIUM_01";
 
-void setup() {
-  Serial.begin(9600);
-  wifiConn.start(ssid, password);
-  if (wifiConn.getConnectionType() == "STA") {
-    udpConn.startMulticast(227, 55, 77, 99, multicastPort);
-  }
-}
-
-void test(String req) {
-  Serial.println("Callback message: " + req);
-}
-
-void loop() {
-  wifiConn.createWebServer(test);
-  if (wifiConn.getConnectionType() == "STA") {
-    udpConn.listeningMulticast();
-    if (udpConn.getMulticastPacket() != "") {
-      Serial.println(udpConn.getMulticastPacket());
+void server(WiFiClient client, String message) {
+  if (message && !message.equals("")) {
+    Serial.println("Callback...");
+    Serial.println("Mensagem: " + message);
+    if (message.equals("TESTE")) {
+      Serial.println("Received TESTE message");
+      client.printf("Received message!");
+      client.flush();
     }
   }
+}
+
+void setup() {
+  Serial.begin(9600);  
+  IUTConn.setSocketCallback(server);
+  IUTConn.start(ssid, password, tokenID);
+}
+
+void loop() {  
+  IUTConn.listenSocket();
 }

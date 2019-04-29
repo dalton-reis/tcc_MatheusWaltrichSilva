@@ -359,6 +359,7 @@ GameObject:
   - component: {fileID: 367071693}
   - component: {fileID: 367071695}
   - component: {fileID: 367071694}
+  - component: {fileID: 367071696}
   m_Layer: 5
   m_Name: Principal_Panel
   m_TagString: Untagged
@@ -420,6 +421,18 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 367071692}
   m_CullTransparentMesh: 0
+--- !u!114 &367071696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 367071692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3209df1ddd2761d4b91b6d9afbf37364, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jogarButton: {fileID: 2036020621}
 --- !u!1 &528377089
 GameObject:
   m_ObjectHideFlags: 0
@@ -1285,9 +1298,9 @@ RectTransform:
   m_Father: {fileID: 367071693}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 157, y: -127}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -87.9, y: 36.800003}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1729515602
@@ -1513,7 +1526,6 @@ GameObject:
   - component: {fileID: 2036020623}
   - component: {fileID: 2036020622}
   - component: {fileID: 2036020621}
-  - component: {fileID: 2036020624}
   m_Layer: 5
   m_Name: Jogar_Btn
   m_TagString: Untagged
@@ -1535,9 +1547,9 @@ RectTransform:
   m_Father: {fileID: 367071693}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -170.7, y: -127}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 92.79999, y: 36.699997}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2036020621
@@ -1584,12 +1596,12 @@ MonoBehaviour:
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &2036020622
@@ -1626,17 +1638,6 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2036020619}
   m_CullTransparentMesh: 0
---- !u!114 &2036020624
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2036020619}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8c099991536ee34aa5e05a35c79e2dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2044886184
 GameObject:
   m_ObjectHideFlags: 0

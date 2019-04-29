@@ -2,32 +2,13 @@
 #include "WiFiConnect.h"
 #include <FS.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
 #include <user_interface.h>
 
-WiFiServer server(80);
-String HTML_PAGE = "";
+ESP8266WebServer server(80);
 String connectionType;
 
-WiFiConnect::WiFiConnect() {
-
-}
-  
-void WiFiConnect::loadHTML() {
-  HTML_PAGE = "<html>";
-  HTML_PAGE +=  "<head>";
-  HTML_PAGE +=    "<title>Aquário Virtual - Configurações</title>";  
-  HTML_PAGE +=  "</head>";
-  HTML_PAGE +=  "<body>";
-  HTML_PAGE +=    "<label>Informe o SSID</label>";
-  HTML_PAGE +=    "<input type=\"text\" id=\"input-ssid\"/>";
-  HTML_PAGE +=    "<br>";
-  HTML_PAGE +=    "<label>Informe a senha</label>";
-  HTML_PAGE +=    "<input type=\"password\" id=\"input-password\"/>";
-  HTML_PAGE +=    "<br>";
-  HTML_PAGE +=    "<a href='' onclick=\"this.href = '\?ssid=' + document.getElementById('input-ssid').value + '&password=' + document.getElementById('input-password').value\">Gravar</a>";
-  HTML_PAGE +=  "</body>";
-  HTML_PAGE +="</html>";
-}
+WiFiConnect::WiFiConnect() {}
       
 String WiFiConnect::readFile(String file) {
   File readFile = SPIFFS.open(file, "r");
@@ -66,8 +47,7 @@ String WiFiConnect::getConfigFromPage(String parameter) {
 
 void WiFiConnect::connectAccessPoint(const char* APssid, const char* APpwd) {
   WiFi.mode(WIFI_AP);  
-  WiFi.softAP(APssid, APpwd);   
-  server.begin();
+  WiFi.softAP(APssid, APpwd);     
   Serial.println(WiFi.softAPIP());
 }
 
@@ -93,22 +73,9 @@ String WiFiConnect::getConnectionType() {
   return connectionType;
 }
 
-void WiFiConnect::createWebServer(void (*callback)(String request)) {  
-  WiFiClient client = server.available();
-  if (!client) {
-    return;
-  }
+void WiFiConnect::webServer() {      
 
-  while(!client.available()){
-    delay(1);
-  }
-
-  String req = client.readStringUntil('\r');
-  Serial.println(req);
-  client.flush();
-
-  client.print(HTML_PAGE);
-  client.flush();
+  String req = server.arg("plain");
 
   if (req.indexOf("ssid=") >= 0) {
     String content = req.substring(req.indexOf("ssid="));
@@ -121,14 +88,15 @@ void WiFiConnect::createWebServer(void (*callback)(String request)) {
     }
   } else if (req.indexOf("format=true") >= 0) {
     SPIFFS.format();
-  } else {
-    callback(req);
   }
+}
+
+void WiFiConnect::handleWebServer() {
+  server.handleClient();
 }
 
 void WiFiConnect::start(const char* APssid, const char* APpwd) {  
   SPIFFS.begin();
-  loadHTML();
   String wifiConfig = readFile("/wifi-config.txt");
   Serial.println("Lido arquivo");  
   if (wifiConfig.length() == 0) {
@@ -143,9 +111,18 @@ void WiFiConnect::start(const char* APssid, const char* APpwd) {
       connectionType = "AP";
     } else {
       wifi_set_sleep_type(NONE_SLEEP_T);
-      Serial.println(WiFi.localIP());
-      server.begin();
+      Serial.println(WiFi.localIP());      
       connectionType = "STA";
     }
   }
+  server.on("/wifi_config", [this]() {
+    if (server.method() == HTTP_POST && server.hasArg("plain")) {
+      server.send(200, "text/plain", "Received body");
+      delay(300);
+      webServer();      
+    } else {
+      server.send(405, "text/plain", "Incorrect method or body is blank");
+    }
+  });
+  server.begin();
 }
