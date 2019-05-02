@@ -1,16 +1,15 @@
 #include <Arduino.h>
-#include <IUTHTTP.h>
+#include <IUTConnect.h>
 
 //VIVO-52C0|Td9VYk7m3W 
-IUTHTTP IUTConn;
+IUTConnect IUTConn;
 unsigned int multicastPort = 5000;
 char* ssid = "Aquario";
 char* password = "aquario-virtual";
 char* tokenID = "AQUARIUM_01";
 
 void server(WiFiClient client, String message) {
-  if (message && !message.equals("")) {
-    Serial.println("Callback...");
+  if (message && !message.equals("")) {    
     Serial.println("Mensagem: " + message);
     if (message.equals("TESTE")) {
       Serial.println("Received TESTE message");

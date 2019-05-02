@@ -1,99 +1,96 @@
 #include <Arduino.h>
-#include "IUTHTTP.h"
+#include "IUTConnect.h"
 #include <WiFiConnect.h>
 #include <ESPAsyncUDP.h>
-#include <sstream>
+#include <stdlib.h>
 #include <ESP8266WiFi.h>
 
 WiFiServer wifiServer(8080);
+String socketData = "";
 
-void IUTHTTP::setAccessPointSSID(char* SSID) {
+void IUTConnect::setAccessPointSSID(char* SSID) {
   this->accessPointSSID = SSID;
 }
 
-char* IUTHTTP::getAccessPointSSID() {
+char* IUTConnect::getAccessPointSSID() {
   return this->accessPointSSID;
 }
 
-void IUTHTTP::setAccessPointPassword(char* password) {
+void IUTConnect::setAccessPointPassword(char* password) {
   this->accessPointPassword = password;
 }
 
-char* IUTHTTP::getAccessPointPassword() {
+char* IUTConnect::getAccessPointPassword() {
   return this->accessPointPassword;
 }
 
-void IUTHTTP::setTokenID(char* tokenID) {
+void IUTConnect::setTokenID(char* tokenID) {
   this->tokenID = tokenID;
 }
 
-char* IUTHTTP::getTokenID() {
+char* IUTConnect::getTokenID() {
   return this->tokenID;
 }
 
-void IUTHTTP::setMulticastIP(char* multicastIP) {
+void IUTConnect::setMulticastIP(char* multicastIP) {
   this->multicastIP = multicastIP;
 }
 
-char* IUTHTTP::getMulticastIP() {
+char* IUTConnect::getMulticastIP() {
   return this->multicastIP;
 }
 
-void IUTHTTP::setMulticastPort(unsigned int multicastPort) {
+void IUTConnect::setMulticastPort(unsigned int multicastPort) {
   this->multicastPort = multicastPort;
 }
 
-unsigned int IUTHTTP::getMulticastPort() {
+unsigned int IUTConnect::getMulticastPort() {
   return this->multicastPort;
 }
 
-IPAddress IUTHTTP::getDeviceIP() {
+IPAddress IUTConnect::getDeviceIP() {
   return this->deviceIP;
 }
 
-void IUTHTTP::setSocketCallback(void (*callback)(WiFiClient client, String message)) {
+void IUTConnect::setSocketCallback(void (*callback)(WiFiClient client, String message)) {
   this->socketCallback = callback;
 }
 
-void IUTHTTP::listenSocket() {
+void IUTConnect::listenSocket() {
   this->wifiConn.handleWebServer();
   WiFiClient client = wifiServer.available();  
   if (client) {
-    String data = "";    
     while (client.connected()) {      
-      data = "";
+      socketData = "";
       this->wifiConn.handleWebServer();            
       while (client.available() > 0) {        
         char c = client.read();
-        data += c;
-        Serial.write(c);
+        socketData += c;        
       }
-      delay(10);      
-      this->socketCallback(client, data);      
+      delay(10);
+      this->socketCallback(client, socketData);
     }
     client.stop();
   }
 }
 
-void IUTHTTP::initializeWiFiConn() {
+void IUTConnect::initializeWiFiConn() {
   this->wifiConn.start(this->accessPointSSID, this->accessPointPassword);
   wifiServer.begin();
 }
 
-void IUTHTTP::handlePacket(AsyncUDPPacket packet) {
+void IUTConnect::handlePacket(AsyncUDPPacket packet) {
   if (packet.remoteIP() != WiFi.localIP() && packet.isMulticast()) {
     char* data = (char *) packet.data();
     data[strlen(data)-1] = 0;
-    Serial.write(packet.data(), packet.length());
-    Serial.println(data);
     if (data && strcmp(data, this->tokenID)) {
-      deviceIP = packet.remoteIP();
-      packet.printf(this->tokenID);
+      deviceIP = packet.remoteIP();      
+      packet.printf("HELLO_DEVICE");
     }
   }
 }
 
-void IUTHTTP::initializeMulticast() {
+void IUTConnect::initializeMulticast() {
   IPAddress multicastAddress;
   multicastAddress.fromString(this->multicastIP);
   if (this->udpConn.listenMulticast(multicastAddress, this->multicastPort)) {
@@ -103,19 +100,19 @@ void IUTHTTP::initializeMulticast() {
   }
 }
 
-void IUTHTTP::start(char* accessPointSSID, char* accessPointPassword, char* tokenID) {
+void IUTConnect::start(char* accessPointSSID, char* accessPointPassword, char* tokenID) {
   this->setAccessPointSSID(accessPointSSID);
   this->setAccessPointPassword(accessPointPassword);
   this->setTokenID(tokenID);
   this->start();
 }
 
-void IUTHTTP::start(char* tokenID) {
+void IUTConnect::start(char* tokenID) {
   this->setTokenID(tokenID);
   this->start();
 }
 
-void IUTHTTP::start() {
+void IUTConnect::start() {
   if (!this->accessPointSSID || strlen(this->accessPointSSID) <= 0) {
     Serial.println("Access Point SSID is mandatory!");
     return;

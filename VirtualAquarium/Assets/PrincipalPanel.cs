@@ -19,10 +19,7 @@ public class PrincipalPanel : MonoBehaviour {
 
     void jogarButtonFunc()
     {
-        UDPConn udpServer = new UDPConn();
-        udpServer.createUDPConn("227.55.77.99", 5000);
-        udpServer.sendMessage("AQUARIUM_01");
-        Debug.Log(udpServer.receiveMessage());
-        Debug.Log("Enviado pelo Unity");
+        IUTConnect conn = new IUTConnect();
+        conn.start("AQUARIUM_01");
     }
 }

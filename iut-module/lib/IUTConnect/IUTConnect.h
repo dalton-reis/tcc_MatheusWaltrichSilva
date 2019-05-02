@@ -1,16 +1,16 @@
 /*
-  IUTHTTP.h - Library for communicate ESP8266 by HTTP protocol.
+  IUTConnect.h - Library for communicate ESP8266 by HTTP protocol.
   Created by Flávio Omar Losada, April 26, 2019.
   Released into the public domain.
 */
-#ifndef IUTHTTP_h
-#define IUTHTTP_h
+#ifndef IUTConnect_h
+#define IUTConnect_h
 
 #include <Arduino.h>
 #include <WiFiConnect.h>
 #include <ESPAsyncUDP.h>
 
-class IUTHTTP {
+class IUTConnect {
   public:
     void setAccessPointSSID(char* SSID);
     char* getAccessPointSSID();
@@ -30,7 +30,7 @@ class IUTHTTP {
     void listenSocket();
   private:
     void (*socketCallback)(WiFiClient, String);
-    char* accessPointSSID = "IUT_HTTP";
+    char* accessPointSSID = "IUTConnect";
     char* accessPointPassword;
     char* tokenID;
     WiFiConnect wifiConn;
