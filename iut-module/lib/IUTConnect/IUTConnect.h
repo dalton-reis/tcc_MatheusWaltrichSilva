@@ -23,13 +23,14 @@ class IUTConnect {
     void setMulticastPort(unsigned int multicastPort);    
     unsigned int getMulticastPort();
     IPAddress getDeviceIP();
-    void setSocketCallback(void (*callback)(WiFiClient client, String message));
+    void setSocketCallback(void (*callback)(String identifier, String content));
     void start();
     void start(char* tokenID);
     void start(char* accessPointSSID, char* accessPointPassword, char* tokenID);    
     void listenSocket();
+    void sendMessage(String identifier, String value);
   private:
-    void (*socketCallback)(WiFiClient, String);
+    void (*socketCallback)(String);
     char* accessPointSSID = "IUTConnect";
     char* accessPointPassword;
     char* tokenID;

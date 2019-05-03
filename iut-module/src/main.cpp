@@ -8,13 +8,12 @@ char* ssid = "Aquario";
 char* password = "aquario-virtual";
 char* tokenID = "AQUARIUM_01";
 
-void server(WiFiClient client, String message) {
-  if (message && !message.equals("")) {    
-    Serial.println("Mensagem: " + message);
-    if (message.equals("TESTE")) {
+void server(String identifier, String content) {
+  if (content && !content.equals("")) {    
+    Serial.println("Mensagem: " + content);
+    if (content.equals("TESTE")) {
       Serial.println("Received TESTE message");
-      client.printf("Received message!");
-      client.flush();
+      IUTConn.sendMessage("TESTE", "Received message!");      
     }
   }
 }

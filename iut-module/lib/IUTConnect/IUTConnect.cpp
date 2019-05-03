@@ -52,7 +52,7 @@ IPAddress IUTConnect::getDeviceIP() {
   return this->deviceIP;
 }
 
-void IUTConnect::setSocketCallback(void (*callback)(WiFiClient client, String message)) {
+void IUTConnect::setSocketCallback(void (*callback)(String message)) {
   this->socketCallback = callback;
 }
 
@@ -68,9 +68,17 @@ void IUTConnect::listenSocket() {
         socketData += c;        
       }
       delay(10);
-      this->socketCallback(client, socketData);
+      this->socketCallback(socketData.substring(0, socketData.indexOf("|")), socketData.substring(socketData.indexOf("|")+1));
     }
     client.stop();
+  }
+}
+
+void IUTConnect::sendMessage(String identifier, String value) {
+  WiFiClient client = wifiServer.available();
+  if (client) {
+    client.println(identifier + "|" + value);
+    client.flush();
   }
 }
 
