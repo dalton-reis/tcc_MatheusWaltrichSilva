@@ -35,7 +35,8 @@ public class IUTConnect
         }
         else
         {
-            this.moduleIP = sender.Address.ToString();                        
+            this.moduleIP = sender.Address.ToString();
+            IUTModuleProperties.ModuleAddress = this.moduleIP;
             this.startSocket();
         }
     }
