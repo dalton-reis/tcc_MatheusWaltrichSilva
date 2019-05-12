@@ -9,17 +9,7 @@ public class FoodPoint : MonoBehaviour {
     // Use this for initialization
     void Start () {
         
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Collided");
-        if (other.name == "ParticleSystem")
-        {
-            addFood();
-            Debug.Log("Caiu comida");
-        }
-    }
+    }    
 
     // Update is called once per frame
     void Update () {

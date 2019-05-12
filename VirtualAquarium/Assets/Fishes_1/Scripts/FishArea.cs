@@ -2,15 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FishArea : MonoBehaviour {
     public GameObject[] prefabs;
     public int count;
     public float speed = 10;
     public float rotationSpeed = 5f;
-    public float raycastDistance = 10f;
+    public float raycastDistance = 10f;    
     public FoodPoint feedPoint;
-    public ParticleSystem particleFood;    
+    public ParticleSystem particleFood;
+    public Slider healthSlider;
     public int Count
     {
         get
@@ -36,9 +38,35 @@ public class FishArea : MonoBehaviour {
     
     void Start()
     {
-        fishes = transform.GetComponentsInChildren<Fish>();
+        AquariumProperties.aquariumTemperature = 25.0f;       
+        fishes = transform.GetComponentsInChildren<Fish>();        
         InitializeAllFishes();
     }    
+
+    private void updateAquariumHealth()
+    {
+        int totalLife = 0;
+        int countFishes = 0;
+        for (int i = 0; i < fishes.Length; i++)
+        {
+            if (fishes[i].gameObject.activeSelf)
+            {
+                totalLife += fishes[i].life;
+                ++countFishes;
+            }
+            
+        }
+        if (countFishes > 0)
+        {
+            AquariumProperties.aquariumHealth = totalLife / countFishes;
+            healthSlider.value = AquariumProperties.aquariumHealth * 0.01f;
+        }
+        else
+        {
+            AquariumProperties.aquariumHealth = 0;
+            healthSlider.value = 0;
+        }
+    }
 
     public void InitializeAllFishes()
     {
@@ -86,12 +114,13 @@ public class FishArea : MonoBehaviour {
 
     public void Update()
     {
+        updateAquariumHealth();
         if (Input.GetKeyDown(KeyCode.Space)) 
-        {
+        {            
             particleFood.Play();            
         }
         if (feedPoint.totalFood() > 0)
-        {
+        {            
             feedFishes();
         }
         UpdateFishes();
@@ -101,13 +130,16 @@ public class FishArea : MonoBehaviour {
     {
         for (int i = 0; i < fishes.Length; i++)
         {
-            fishes[i].Move();
+            if (fishes[i].gameObject.activeSelf)
+            {
+                fishes[i].Move();
+            }            
         }
     }
 
     public void SpawnFish()
     {
-        GameObject temp = Instantiate(GetRandomPrefab(), transform);
+        Instantiate(GetRandomPrefab(), transform);
 
     }
 
@@ -143,11 +175,23 @@ public class FishArea : MonoBehaviour {
         feedPoint.removeFood();
     }
 
+    private bool hasFishesFeeding()
+    {
+        for (int i = 0; i < fishes.Length; i++)
+        {
+            if (fishes[i].state == Fish.FStates.Feed)
+            {                                
+                return true;
+            }
+        }        
+        return false;
+    }
+
     private void feedFishes()
     {
-        int index = UnityEngine.Random.Range(0, fishes.Length - 1);
-        if (fishes[index].life < 80)
-        {
+        int index = UnityEngine.Random.Range(0, fishes.Length - 1);        
+        if (fishes[index].life < 80 && !hasFishesFeeding())
+        {            
             fishes[index].goToFeed();
         }        
     }
