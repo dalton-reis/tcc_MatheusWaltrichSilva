@@ -13,6 +13,7 @@ public class FishArea : MonoBehaviour {
     public FoodPoint feedPoint;
     public ParticleSystem particleFood;
     public Slider healthSlider;
+    public Light directionalLight;
     public int Count
     {
         get
@@ -38,7 +39,9 @@ public class FishArea : MonoBehaviour {
     
     void Start()
     {
-        AquariumProperties.aquariumTemperature = 25.0f;       
+        AquariumProperties.aquariumTemperature = 25.0f;
+        AquariumProperties.lightIntensity = 2;
+        AquariumProperties.foodAvailable = 10;
         fishes = transform.GetComponentsInChildren<Fish>();        
         InitializeAllFishes();
     }    
@@ -112,12 +115,26 @@ public class FishArea : MonoBehaviour {
 #endif
     }
 
+    public void updateAquariumLight(float lightIntensity)
+    {
+        AquariumProperties.lightIntensity += lightIntensity;
+        directionalLight.intensity = AquariumProperties.lightIntensity;
+    }
+
     public void Update()
     {
         updateAquariumHealth();
         if (Input.GetKeyDown(KeyCode.Space)) 
         {            
             particleFood.Play();            
+        }
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            updateAquariumLight(0.03f);
+        } 
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            updateAquariumLight(-0.03f);
         }
         if (feedPoint.totalFood() > 0)
         {            
@@ -173,6 +190,8 @@ public class FishArea : MonoBehaviour {
     public void removeFood()
     {
         feedPoint.removeFood();
+        feedPoint.foods[feedPoint.foods.Count - 1].SetActive(false);
+        feedPoint.foods.RemoveAt(feedPoint.foods.Count-1);
     }
 
     private bool hasFishesFeeding()

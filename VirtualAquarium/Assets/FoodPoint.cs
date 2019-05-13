@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class FoodPoint : MonoBehaviour {
 
-    private int foodCount = 0;    
+    private int foodCount = 0;
+    public List<GameObject> foods;
 
     // Use this for initialization
     void Start () {
-        
+        foods = new List<GameObject>();
     }    
 
     // Update is called once per frame

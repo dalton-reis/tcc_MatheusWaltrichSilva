@@ -8,4 +8,6 @@ public class AquariumProperties : ScriptableObject {
     public static float externalTemperature;
     public static float heaterTemperature;
     public static float aquariumHealth;
+    public static float lightIntensity;
+    public static float foodAvailable;
 }

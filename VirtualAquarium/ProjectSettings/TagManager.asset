@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Vase
   - Terrain
+  - HealthSlider
+  - Food
   layers:
   - Default
   - TransparentFX

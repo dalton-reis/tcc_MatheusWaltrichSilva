@@ -7,6 +7,7 @@ public class Fish : MonoBehaviour {
     Animator animator;
     float timer;
     public FStates state;
+    public FStates lastState;
     List<Transform> playersAround = new List<Transform>();
     private FishArea fishArea;
     private Vector3 target;    
@@ -14,7 +15,7 @@ public class Fish : MonoBehaviour {
     private float deadTime = 0;
     private bool swimmedAway = false;
     private bool wasStayed = false;
-    private const float SECONDS_TO_RECUDE_LIFE = 15f;
+    private const float SECONDS_TO_REDUCE_LIFE = 5f;
     public int life;
     public float lifeTime;
     public enum FStates
@@ -32,7 +33,7 @@ public class Fish : MonoBehaviour {
         if (state != FStates.Die)
         {
             lifeTime += Time.deltaTime;
-            if (lifeTime > SECONDS_TO_RECUDE_LIFE && life > 0)
+            if (lifeTime > SECONDS_TO_REDUCE_LIFE && life > 0)
             {
                 life -= 2;
                 if (swimmedAway)
@@ -48,10 +49,10 @@ public class Fish : MonoBehaviour {
                 lifeTime = 0;
             }
             else if (life <= 0)
-            {
-                //this.gameObject.SetActive(false);                     
-                target = new Vector3(0, fishArea.transform.position.y + 2, 0);
-                animator.SetInteger("State", 2);
+            {                 
+                target = new Vector3(transform.position.x, fishArea.transform.position.y + 2.3f, 0);
+                animator.speed = 0.2f;
+                lastState = state;
                 state = FStates.Die;
             }
         }
@@ -59,26 +60,27 @@ public class Fish : MonoBehaviour {
 
     internal void goToFeed()
     {
-        state = FStates.Feed;        
+        lastState = state;
+        state = FStates.Feed;
+        target = fishArea.feedPoint.foods[fishArea.feedPoint.foods.Count-1].transform.position;
     }
 
     void Feed()
-    {
-        target = fishArea.feedPoint.transform.position;
+    {        
         transform.position += transform.forward * Time.deltaTime * fishArea.speed * 1.5f;
         transform.forward = Vector3.MoveTowards(transform.forward, target - transform.position, Time.deltaTime * fishArea.rotationSpeed);
     }
 
     void Die()
-    {        
-        transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * fishArea.speed);
+    {
+        transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * fishArea.speed * 0.3f);
         deadTime += Time.deltaTime;
         if (totalRotate < 180)
         {
-            transform.Rotate(0, 0, 10);
-            totalRotate++;
+            transform.Rotate(0, 0, 2);
+            totalRotate += 2;
         } 
-        if (transform.position == target && deadTime > 10)
+        if (transform.position == target && deadTime > 25)
         {
             gameObject.SetActive(false);
         }       
@@ -93,7 +95,7 @@ public class Fish : MonoBehaviour {
         {
             if (cast.collider.transform != this.transform)
             {
-                if (cast.collider.tag.Equals("Vase") || cast.collider.tag.Equals("Terrain"))
+                if (cast.collider.tag.Equals("Vase") || cast.collider.tag.Equals("Terrain") || lastState == FStates.Feed)
                 {
                     do
                     {
@@ -112,7 +114,11 @@ public class Fish : MonoBehaviour {
             target = fishArea.GetRandomPoint();
             timer = UnityEngine.Random.Range(0, 10f);
             if (UnityEngine.Random.Range(0f, 1f) > 0.9f)
+            {
+                lastState = state;
                 state = FStates.Stay;
+            }
+                
         }        
     }
 
@@ -135,7 +141,11 @@ public class Fish : MonoBehaviour {
         if (timer < 0f)
         {
             if (UnityEngine.Random.Range(0f, 1f) < 0.9f)
+            {
+                lastState = state;
                 state = FStates.Patrol;
+            }
+                
         }
     }
 
@@ -165,6 +175,7 @@ public class Fish : MonoBehaviour {
 
     internal void Initialize(FishArea fishArea)
     {
+        lastState = state;
         state = FStates.Patrol;
         this.fishArea = fishArea;
         animator = GetComponent<Animator>();
@@ -186,16 +197,19 @@ public class Fish : MonoBehaviour {
         if (other.tag == "Player" && state != FStates.Feed)
         {            
             AddPlayer(other.transform);
+            lastState = state;
             state = FStates.SwimAway;
             if (animator != null)
             {
                 animator.SetInteger("State", 1);
             }            
-        } else if (other.gameObject.name == "FeedPoint" && state == FStates.Feed)
+        } else if (other.tag == "Food" && state == FStates.Feed)
         {
+            target = transform.position;
             fishArea.removeFood();
-            life += 10;
-            state = FStates.Stay;
+            life += UnityEngine.Random.Range(5, 10);
+            lastState = state;
+            state = FStates.Patrol;
         }
     }
 
@@ -206,6 +220,7 @@ public class Fish : MonoBehaviour {
             RemovePlayer(other.transform);
             if (playersAround.Count == 0)
             {
+                lastState = state;
                 state = FStates.Patrol;
                 target = fishArea.GetRandomPoint();
             }
