@@ -23,6 +23,19 @@ public class Fish : MonoBehaviour {
         Patrol, Stay, SwimAway, Feed, Die
     }
 
+    public class FishComparer : IComparer<Fish>
+    {
+        public int Compare(Fish x, Fish y)
+        {
+            if (x.life == 0 || y.life == 0)
+            {
+                return 0;
+            }             
+            return x.life.CompareTo(y.life);
+
+        }
+    }
+
     private void Start()
     {
         life = 100;
@@ -82,6 +95,7 @@ public class Fish : MonoBehaviour {
         } 
         if (transform.position == target && deadTime > 25)
         {
+            fishArea.removeFish(this);
             gameObject.SetActive(false);
         }       
     }
