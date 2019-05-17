@@ -49,7 +49,7 @@ public class Fish : MonoBehaviour {
             {
                 if (lifeTime >= 1)
                 {
-                    life -= AquariumProperties.lifeLostPerHour / AquariumProperties.timeSpeedMultiplier;
+                    life -= AquariumProperties.lifeLostPerHour / AquariumProperties.timeSpeedMultiplier + AquariumProperties.lossLifeCoefficient;
                     lifeTime = 0;
                 }
                 if (timeSwimmingAway >= 1)

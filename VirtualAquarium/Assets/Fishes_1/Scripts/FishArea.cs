@@ -12,8 +12,7 @@ public class FishArea : MonoBehaviour {
     public float rotationSpeed = 5f;
     public float raycastDistance = 10f;    
     public FoodPoint feedPoint;
-    public ParticleSystem particleFood;    
-    public Light directionalLight;        
+    public ParticleSystem particleFood;        
     public int Count
     {
         get
@@ -53,15 +52,7 @@ public class FishArea : MonoBehaviour {
         {
             AquariumProperties.foodAvailable--;
             particleFood.Play();
-        }
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            updateAquariumLight(0.03f);
-        }
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            updateAquariumLight(-0.03f);
-        }
+        }        
         fishesOrderByFood.Sort(fishComparer);
         if (feedPoint.totalFood() > 0)
         {
@@ -123,12 +114,6 @@ public class FishArea : MonoBehaviour {
 #else
                 Destroy(fishes[i].gameObject);
 #endif
-    }
-
-    public void updateAquariumLight(float lightIntensity)
-    {
-        AquariumProperties.lightIntensity += lightIntensity;
-        directionalLight.intensity = AquariumProperties.lightIntensity;
     }    
 
     private void UpdateFishes()

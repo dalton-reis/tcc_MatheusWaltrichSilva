@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class IUTConnect
 {
@@ -16,6 +17,7 @@ public class IUTConnect
     private string multicastIP { get; set; }
     private int multicastPort { get; set; }
     private string tokenID { get; set; }
+    public UnityEvent<string> callbackSocket { get;  set; }
     private string moduleIP;
 
     public IUTConnect()
@@ -85,6 +87,7 @@ public class IUTConnect
             if (state.sb.Length > 1)
             {
                 Debug.Log(state.sb.ToString());
+                callbackSocket.Invoke(state.sb.ToString());
             }
             
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,7 @@ public class PrincipalPanel : MonoBehaviour {
     void jogarButtonFunc()
     {
         IUTConnect conn = new IUTConnect();
+        conn.callbackSocket.AddListener(socketCallback);
         conn.start("AQUARIUM_01");
     }
 
@@ -30,5 +32,10 @@ public class PrincipalPanel : MonoBehaviour {
     {
         configuracaoPanel.SetActive(true);
         GameObject.Find("Principal_Panel").SetActive(false);
+    }
+
+    void socketCallback(string message)
+    {
+        
     }
 }

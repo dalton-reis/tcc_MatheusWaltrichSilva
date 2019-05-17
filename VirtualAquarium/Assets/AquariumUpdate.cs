@@ -12,10 +12,12 @@ public class AquariumUpdate : MonoBehaviour {
     public Slider aquariumTemperatureSlider;
     public Text foodCountText;
     public Text hourText;
-    public RawImage wheaterImage;    
+    public RawImage wheaterImage;
+    public Light directionalLight;
     private float accumulatedTime;
     private DateTime lastFoodHour;
     private float timeChangeWheater;
+    private bool isNight;
 
 	// Use this for initialization
 	void Start () {
@@ -48,6 +50,9 @@ public class AquariumUpdate : MonoBehaviour {
         updateHealth();
         updateFood();
         updateWheater();
+        updateTemperature();
+        updateLightItensity();
+        updateHealthCoefficient();
 	}
 
     void updateTime()
@@ -104,6 +109,7 @@ public class AquariumUpdate : MonoBehaviour {
 
     void updateWheater()
     {
+        isNight = AquariumProperties.aquariumHour >= DateTime.ParseExact("18:30", "HH:mm", CultureInfo.InvariantCulture) && AquariumProperties.aquariumHour <= DateTime.ParseExact("04:59", "HH:mm", CultureInfo.InvariantCulture);
         timeChangeWheater += Time.deltaTime;
         if (timeChangeWheater >= AquariumProperties.timeSpeedMultiplier * 4)
         {
@@ -111,14 +117,10 @@ public class AquariumUpdate : MonoBehaviour {
             do
             {
                 int wheater = UnityEngine.Random.Range(0, 4);
-                if (AquariumProperties.aquariumHour >= DateTime.ParseExact("18:30", "HH:mm", CultureInfo.InvariantCulture)
-                    && AquariumProperties.aquariumHour <= DateTime.ParseExact("04:59", "HH:mm", CultureInfo.InvariantCulture)
-                    && (wheater == 0 || wheater == 1)) 
+                if (isNight && (wheater == 0 || wheater == 1)) 
                 {
                     acceptable = false;
-                } else if (AquariumProperties.aquariumHour >= DateTime.ParseExact("05:00", "HH:mm", CultureInfo.InvariantCulture)
-                    && AquariumProperties.aquariumHour <= DateTime.ParseExact("18:29", "HH:mm", CultureInfo.InvariantCulture)
-                    && wheater == 4)
+                } else if (!isNight && wheater == 4)
                 {
                     acceptable = false;
                 } else
@@ -134,23 +136,76 @@ public class AquariumUpdate : MonoBehaviour {
             case AquariumProperties.Wheater.Sun:
                 wheaterImage.texture = Resources.Load<Texture>("sun.png");
                 AquariumProperties.externalTemperature = UnityEngine.Random.Range(32, 43);
+                AquariumProperties.externalLightIntensity = 0.5f;
                 break;
             case AquariumProperties.Wheater.SunAndCloud:
                 wheaterImage.texture = Resources.Load<Texture>("sun-and-cloud.png");
                 AquariumProperties.externalTemperature = UnityEngine.Random.Range(26, 33);
+                AquariumProperties.externalLightIntensity = 0.3f;
                 break;
             case AquariumProperties.Wheater.Snow:
                 wheaterImage.texture = Resources.Load<Texture>("snow.png");
                 AquariumProperties.externalTemperature = UnityEngine.Random.Range(-2, 5);
+                AquariumProperties.externalLightIntensity = isNight ? 0.0f : 0.2f;
                 break;
             case AquariumProperties.Wheater.Rain:
                 wheaterImage.texture = Resources.Load<Texture>("rain.png");
                 AquariumProperties.externalTemperature = UnityEngine.Random.Range(10, 24);
+                AquariumProperties.externalLightIntensity = isNight ? 0.0f : 0.2f;
                 break;
             case AquariumProperties.Wheater.Moon:
                 wheaterImage.texture = Resources.Load<Texture>("moon.png");
                 AquariumProperties.externalTemperature = UnityEngine.Random.Range(8, 21);
+                AquariumProperties.externalLightIntensity = 0.0f;
                 break;
         }
+    }
+
+    void updateTemperature()
+    {
+        float heaterAquariumDiff = 0;
+        if (AquariumProperties.heaterTemperature > AquariumProperties.aquariumTemperature)
+        {
+            heaterAquariumDiff = AquariumProperties.heaterTemperature - AquariumProperties.aquariumTemperature;
+        }
+        float externalAquariumDiff = AquariumProperties.externalTemperature - AquariumProperties.aquariumTemperature;
+        AquariumProperties.temperatureCoefficient = externalAquariumDiff * 0.02f + heaterAquariumDiff * 0.03f;
+        AquariumProperties.aquariumTemperature += AquariumProperties.temperatureCoefficient;
+        aquariumTemperatureSlider.value = AquariumProperties.aquariumTemperature;
+    }
+
+    void updateLightItensity()
+    {
+        AquariumProperties.lightIntensity = AquariumProperties.externalLightIntensity + AquariumProperties.sensorLightIntensity;
+        directionalLight.intensity = AquariumProperties.lightIntensity;
+    }
+
+    void updateHealthCoefficient()
+    {
+        float temperatureCoefficient = 0;
+        float lightCoefficient = 0;
+        if (AquariumProperties.aquariumTemperature >= AquariumProperties.MIN_TEMPERATURE_SUPPORTED && AquariumProperties.aquariumTemperature <= AquariumProperties.MAX_TEMPERATURE_SUPPORTED)
+        {
+            temperatureCoefficient = 0;
+        } else if (AquariumProperties.aquariumTemperature > AquariumProperties.MAX_TEMPERATURE_SUPPORTED)
+        {
+            temperatureCoefficient = (AquariumProperties.MAX_TEMPERATURE_SUPPORTED - AquariumProperties.aquariumTemperature) * 0.03f;
+        } else if (AquariumProperties.aquariumTemperature < AquariumProperties.MIN_TEMPERATURE_SUPPORTED)
+        {
+            temperatureCoefficient = (AquariumProperties.aquariumTemperature - AquariumProperties.MIN_TEMPERATURE_SUPPORTED) * 0.03f;
+        }
+        float maxLight = isNight ? AquariumProperties.MAX_LIGHT_SUPPORTED_NIGHT : AquariumProperties.MAX_LIGHT_SUPPORTED;
+        float minLight = isNight ? AquariumProperties.MIN_LIGHT_SUPPORTED_NIGHT : AquariumProperties.MIN_LIGHT_SUPPORTED;
+        if (AquariumProperties.lightIntensity >= minLight && AquariumProperties.lightIntensity <= maxLight)
+        {
+            lightCoefficient = 0;
+        } else if (AquariumProperties.lightIntensity > maxLight)
+        {
+            lightCoefficient = (AquariumProperties.lightIntensity - maxLight); 
+        } else if (AquariumProperties.lightIntensity < minLight)
+        {
+            lightCoefficient = (minLight - AquariumProperties.lightIntensity);
+        }
+        AquariumProperties.lossLifeCoefficient = lightCoefficient + temperatureCoefficient;
     }
 }
