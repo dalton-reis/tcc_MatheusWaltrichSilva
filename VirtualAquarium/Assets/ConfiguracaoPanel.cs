@@ -10,23 +10,62 @@ public class ConfiguracaoPanel : MonoBehaviour {
     public InputField SSIDInput;
     public InputField PasswordInput;
     public GameObject principalPanel;
+    public InputField tokenInput;
+    public Slider speedSlider;
+    public Text speedText;
     // Use this for initialization
     void Start () {
-        confirmarButton.onClick.AddListener(confirmarButtonFunc);
+        confirmarButton.onClick.AddListener(confirmarButtonFunc);        
+        tokenInput.text = AquariumProperties.configs.token;
+        SSIDInput.text = AquariumProperties.configs.ssid;
+        PasswordInput.text = AquariumProperties.configs.password;        
     }
 	
 	// Update is called once per frame
 	void Update () {
-		
+        int value = (int) speedSlider.value;
+        switch (value)
+        {
+            case 0:
+                speedText.text = "Lento";
+                break;
+            case 1:
+                speedText.text = "Normal";
+                break;
+            case 2:
+                speedText.text = "Rápido";
+                break;
+            case 3:
+                speedText.text = "Tempo Real";
+                break;
+        }
 	}
+
+    IEnumerator sendMessage(string route, string content) 
+    {
+        UnityWebRequest www = UnityWebRequest.Post(route, content);
+        www.SetRequestHeader("Content-Type", "text/plain");        
+        yield return www.SendWebRequest();
+        if (www.isNetworkError || www.isHttpError)
+        {
+            Debug.Log(www.error);
+        }
+    }
 
     void confirmarButtonFunc()
     {
-        string SSID = SSIDInput.text;
-        string password = PasswordInput.text;
-        string moduleIP = "http://" + IUTModuleProperties.ModuleAddress != null && !"".Equals(IUTModuleProperties.ModuleAddress) ? IUTModuleProperties.ModuleAddress : IUTModuleProperties.DEFAULT_MODULE_ADDRESS;
-        UnityWebRequest.Post(moduleIP + "/wifi_config", "ssid=" + SSID + "&password=" + password);
+        ConfigProperties configs = new ConfigProperties();
+        configs.token = tokenInput.text;
+        configs.ssid = SSIDInput.text;
+        configs.password = PasswordInput.text;
+        configs.moduleIP = IUTModuleProperties.ModuleAddress != null && !"".Equals(IUTModuleProperties.ModuleAddress) ? IUTModuleProperties.ModuleAddress : IUTModuleProperties.DEFAULT_MODULE_ADDRESS;        
+        string route = "http://" + configs.moduleIP + "/wifi_config";
+        route = "http://192.168.4.1/wifi_config";
+        string message = "ssid=" + configs.ssid + "&password=" + configs.password;
+        Debug.Log(route);
+        StartCoroutine(sendMessage(route, message));        
+        configs.saveConfig();
         principalPanel.SetActive(true);
         GameObject.Find("Configuracao_Panel").SetActive(false);        
-    }
+    }        
 }

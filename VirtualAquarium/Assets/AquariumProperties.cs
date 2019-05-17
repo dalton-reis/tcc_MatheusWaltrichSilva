@@ -26,9 +26,11 @@ public class AquariumProperties : ScriptableObject {
     public static float MAX_LIGHT_SUPPORTED_NIGHT = 1.0f;
     public static float MIN_LIGHT_SUPPORTED = 1.0f;
     public static float MAX_LIGHT_SUPPORTED = 2.0f;
+    public static ConfigProperties configs;
+    public static IUTConnect conn;
     public enum TimeSpeed
     {
-        Slow, Normal, Fast, RealTime        
+        Slow = 0, Normal = 1, Fast = 2, RealTime = 3
     }
     public enum Wheater
     {

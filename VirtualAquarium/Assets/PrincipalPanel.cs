@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PrincipalPanel : MonoBehaviour {
@@ -12,6 +13,7 @@ public class PrincipalPanel : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        AquariumProperties.configs = ConfigProperties.loadConfig();
         jogarButton.onClick.AddListener(jogarButtonFunc);
         configurarButton.onClick.AddListener(configurarButtonFunc);
     }
@@ -23,19 +25,15 @@ public class PrincipalPanel : MonoBehaviour {
 
     void jogarButtonFunc()
     {
-        IUTConnect conn = new IUTConnect();
-        conn.callbackSocket.AddListener(socketCallback);
-        conn.start("AQUARIUM_01");
+        AquariumProperties.conn = new IUTConnect();
+        AquariumProperties.conn.callbackSocket.AddListener(AquariumUpdate.socketCallback);
+        AquariumProperties.conn.start(AquariumProperties.configs.token);
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
     void configurarButtonFunc()
     {
         configuracaoPanel.SetActive(true);
         GameObject.Find("Principal_Panel").SetActive(false);
-    }
-
-    void socketCallback(string message)
-    {
-        
-    }
+    }    
 }

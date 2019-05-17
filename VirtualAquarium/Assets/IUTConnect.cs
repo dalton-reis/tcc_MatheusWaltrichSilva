@@ -6,24 +6,29 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 
+[System.Serializable]
+public class SocketEvent : UnityEvent<string>
+{
+}
+
 public class IUTConnect
 {
     private UdpClient udpClient;
     IPEndPoint remoteEndPoint;
     IPEndPoint localEndPoint;
     Socket client;
-   private const string CONNECTION_SUCCESSFULL_MESSAGE = "HELLO_DEVICE";
+    private const string CONNECTION_SUCCESSFULL_MESSAGE = "HELLO_DEVICE";
 
     private string multicastIP { get; set; }
     private int multicastPort { get; set; }
     private string tokenID { get; set; }
-    public UnityEvent<string> callbackSocket { get;  set; }
+    public SocketEvent callbackSocket = new SocketEvent();
     private string moduleIP;
 
     public IUTConnect()
-    {
+    {        
         this.multicastIP = "227.55.77.99";
-        this.multicastPort = 5000;
+        this.multicastPort = 5000;        
     }
 
     private void multicastCallback(IAsyncResult ar)
@@ -112,7 +117,7 @@ public class IUTConnect
         IPAddress moduleIPAddress = IPAddress.Parse(this.moduleIP);
         IPEndPoint moduleEndPoint = new IPEndPoint(moduleIPAddress, 8080);
         client = new Socket(moduleIPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-        
+        Debug.Log("Socket Started");
         client.Connect(moduleEndPoint);
         this.receiveSocket();        
         sendSocket("TESTE");

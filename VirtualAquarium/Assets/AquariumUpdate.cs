@@ -21,6 +21,7 @@ public class AquariumUpdate : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        AquariumProperties.currentTimeSpeed = (AquariumProperties.TimeSpeed) AquariumProperties.configs.timeSpeed;
         AquariumProperties.aquariumTemperature = 25.0f;
         AquariumProperties.lightIntensity = 2;
         AquariumProperties.foodAvailable = 10;
@@ -207,5 +208,16 @@ public class AquariumUpdate : MonoBehaviour {
             lightCoefficient = (minLight - AquariumProperties.lightIntensity);
         }
         AquariumProperties.lossLifeCoefficient = lightCoefficient + temperatureCoefficient;
+    }
+
+    public static void socketCallback(string message)
+    {
+        string tag = message.Substring(0, message.IndexOf("|"));
+        string value = message.Substring(message.IndexOf("|") + 1);
+        if (tag.Equals("TEMP"))
+        {
+            AquariumProperties.heaterTemperature = float.Parse(value);
+            Debug.Log(AquariumProperties.heaterTemperature);
+        }
     }
 }

@@ -12,26 +12,18 @@ unsigned int multicastPort = 5000;
 char* ssid = "Aquario";
 char* password = "aquario-virtual";
 char* tokenID = "AQUARIUM_01";
-float temperatura;
+int temperatura;
 float temperaturaAnterior = 0;
 
 MCP3008 adc(CLOCK_PIN, MOSI_PIN, MISO_PIN, CS_PIN);
 
 void server(WiFiClient client, String content) {
-  temperatura = adc.readADC(0) * 14 / 1023 + 19;
+  temperatura = adc.readADC(0) * 16 / 1023 + 18;
   if (temperatura != temperaturaAnterior) {
-    client.println(temperatura);
+    client.println("TEMP|" + temperatura);
     client.flush();  
-    Serial.println(temperatura);
-    temperaturaAnterior = temperatura;
-  }
-  if (content && !content.equals("")) {    
-    Serial.println("Mensagem: " + content);    
-    if (content.equals("TESTE")) {
-      Serial.println("Received TESTE message");
-      client.println("Received message!");
-      client.flush();  
-    }
+    Serial.println("TEMP|" + temperatura);
+    temperaturaAnterior = temperatura;    
   }
 }
 

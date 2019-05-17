@@ -75,7 +75,7 @@ String WiFiConnect::getConnectionType() {
 
 void WiFiConnect::webServer() {      
 
-  String req = server.arg("plain");
+  String req = server.urlDecode(server.arg("plain"));
 
   if (req.indexOf("ssid=") >= 0) {
     String content = req.substring(req.indexOf("ssid="));
