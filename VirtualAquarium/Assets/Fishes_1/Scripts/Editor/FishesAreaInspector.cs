@@ -17,20 +17,16 @@ public class FishesAreaInspector : Editor
 
         SerializedProperty raycastDistance = serializedObject.FindProperty("raycastDistance");
         SerializedProperty particleFood = serializedObject.FindProperty("particleFood");
-        SerializedProperty feedPoint = serializedObject.FindProperty("feedPoint");
-        SerializedProperty healthSlider = serializedObject.FindProperty("healthSlider"); 
-        SerializedProperty directionalLight = serializedObject.FindProperty("directionalLight");
-        SerializedProperty foodCountText = serializedObject.FindProperty("foodCountText");
+        SerializedProperty feedPoint = serializedObject.FindProperty("feedPoint");        
+        SerializedProperty directionalLight = serializedObject.FindProperty("directionalLight");        
 
         EditorGUI.BeginChangeCheck();
         EditorGUILayout.PropertyField(prop, true);
         EditorGUILayout.PropertyField(speed, true);
         EditorGUILayout.PropertyField(rotationSpeed, true);
         EditorGUILayout.PropertyField(particleFood, true);
-        EditorGUILayout.PropertyField(feedPoint, true);
-        EditorGUILayout.PropertyField(healthSlider, true);
-        EditorGUILayout.PropertyField(directionalLight, true);
-        EditorGUILayout.PropertyField(foodCountText, true);
+        EditorGUILayout.PropertyField(feedPoint, true);        
+        EditorGUILayout.PropertyField(directionalLight, true);        
 
         EditorGUILayout.PropertyField(raycastDistance, true);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,11 +12,8 @@ public class FishArea : MonoBehaviour {
     public float rotationSpeed = 5f;
     public float raycastDistance = 10f;    
     public FoodPoint feedPoint;
-    public ParticleSystem particleFood;
-    public Slider healthSlider;
-    public Light directionalLight;
-    public Text foodCountText;
-    private float foodTime;
+    public ParticleSystem particleFood;    
+    public Light directionalLight;        
     public int Count
     {
         get
@@ -33,7 +31,7 @@ public class FishArea : MonoBehaviour {
         }
     }
 
-    List<Fish> fishes;
+    public List<Fish> fishes;
     List<Fish> fishesOrderByFood;
     Fish.FishComparer fishComparer;
     BoxCollider collider;
@@ -43,45 +41,33 @@ public class FishArea : MonoBehaviour {
     
     void Start()
     {
-        fishComparer = new Fish.FishComparer();
-        AquariumProperties.aquariumTemperature = 25.0f;
-        AquariumProperties.lightIntensity = 2;
-        AquariumProperties.foodAvailable = 10;
+        fishComparer = new Fish.FishComparer();        
         fishes = new List<Fish>(transform.GetComponentsInChildren<Fish>());
         fishesOrderByFood = new List<Fish>(fishes);
         InitializeAllFishes();
-    }    
+    }
 
-    private void updateAquariumHealth()
+    public void Update()
     {
-        foodTime += Time.deltaTime;
-        if (foodTime >= 180 && AquariumProperties.foodAvailable < 10)
+        if (Input.GetKeyDown(KeyCode.Space) && AquariumProperties.foodAvailable > 0)
         {
-            AquariumProperties.foodAvailable++;
-            foodTime = 0;
+            AquariumProperties.foodAvailable--;
+            particleFood.Play();
         }
-        foodCountText.text = AquariumProperties.foodAvailable.ToString();
-        int totalLife = 0;
-        int countFishes = 0;
-        for (int i = 0; i < fishes.Count; i++)
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            if (fishes[i].gameObject.activeSelf)
-            {
-                totalLife += fishes[i].life;
-                ++countFishes;
-            }
-            
+            updateAquariumLight(0.03f);
         }
-        if (countFishes > 0)
+        if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            AquariumProperties.aquariumHealth = totalLife / countFishes;
-            healthSlider.value = AquariumProperties.aquariumHealth * 0.01f;
+            updateAquariumLight(-0.03f);
         }
-        else
+        fishesOrderByFood.Sort(fishComparer);
+        if (feedPoint.totalFood() > 0)
         {
-            AquariumProperties.aquariumHealth = 0;
-            healthSlider.value = 0;
+            feedFishes();
         }
+        UpdateFishes();
     }
 
     public void InitializeAllFishes()
@@ -143,31 +129,7 @@ public class FishArea : MonoBehaviour {
     {
         AquariumProperties.lightIntensity += lightIntensity;
         directionalLight.intensity = AquariumProperties.lightIntensity;
-    }
-
-    public void Update()
-    {        
-        updateAquariumHealth();
-        if (Input.GetKeyDown(KeyCode.Space) && AquariumProperties.foodAvailable > 0) 
-        {
-            AquariumProperties.foodAvailable--;
-            particleFood.Play();            
-        }
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            updateAquariumLight(0.03f);
-        } 
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            updateAquariumLight(-0.03f);
-        }
-        fishesOrderByFood.Sort(fishComparer);
-        if (feedPoint.totalFood() > 0)
-        {            
-            feedFishes();
-        }
-        UpdateFishes();
-    }
+    }    
 
     private void UpdateFishes()
     {

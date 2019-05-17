@@ -7,6 +7,7 @@
 
 WiFiServer wifiServer(8080);
 String socketData = "";
+WiFiClient client;
 
 void IUTConnect::setAccessPointSSID(char* SSID) {
   this->accessPointSSID = SSID;
@@ -52,7 +53,7 @@ IPAddress IUTConnect::getDeviceIP() {
   return this->deviceIP;
 }
 
-void IUTConnect::setSocketCallback(void (*callback)(String message)) {
+void IUTConnect::setSocketCallback(void (*callback)(WiFiClient client, String content)) {
   this->socketCallback = callback;
 }
 
@@ -68,17 +69,9 @@ void IUTConnect::listenSocket() {
         socketData += c;        
       }
       delay(10);
-      this->socketCallback(socketData.substring(0, socketData.indexOf("|")), socketData.substring(socketData.indexOf("|")+1));
+      this->socketCallback(client, socketData);
     }
     client.stop();
-  }
-}
-
-void IUTConnect::sendMessage(String identifier, String value) {
-  WiFiClient client = wifiServer.available();
-  if (client) {
-    client.println(identifier + "|" + value);
-    client.flush();
   }
 }
 

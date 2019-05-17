@@ -13,10 +13,9 @@ public class Fish : MonoBehaviour {
     private Vector3 target;    
     private int totalRotate = 0;
     private float deadTime = 0;
-    private bool swimmedAway = false;
-    private bool wasStayed = false;
-    private const float SECONDS_TO_REDUCE_LIFE = 5f;
-    public int life;
+    private float timeSwimmingAway = 0;
+    private float timeStayed = 0;    
+    public float life;
     public float lifeTime;
     public enum FStates
     {
@@ -41,26 +40,29 @@ public class Fish : MonoBehaviour {
         life = 100;
     }
 
-    private void lifeTreatment()
+    private void lifeUpdate()
     {
         if (state != FStates.Die)
         {
             lifeTime += Time.deltaTime;
-            if (lifeTime > SECONDS_TO_REDUCE_LIFE && life > 0)
+            if (life > 0)
             {
-                life -= 2;
-                if (swimmedAway)
+                if (lifeTime >= 1)
                 {
-                    --life;
-                    swimmedAway = false;
+                    life -= AquariumProperties.lifeLostPerHour / AquariumProperties.timeSpeedMultiplier;
+                    lifeTime = 0;
                 }
-                else if (wasStayed)
+                if (timeSwimmingAway >= 1)
                 {
-                    ++life;
-                    wasStayed = false;
+                    life -= AquariumProperties.lifeLostPerHour / AquariumProperties.timeSpeedMultiplier;
+                    timeSwimmingAway = 0;
                 }
-                lifeTime = 0;
-            }
+                if (timeStayed >= 1)
+                {
+                    life += AquariumProperties.lifeLostPerHour / AquariumProperties.timeSpeedMultiplier;
+                    timeStayed = 0;
+                }
+            }            
             else if (life <= 0)
             {                 
                 target = new Vector3(transform.position.x, fishArea.transform.position.y + 2.3f, 0);
@@ -138,7 +140,7 @@ public class Fish : MonoBehaviour {
 
     void SwimAway()
     {
-        this.swimmedAway = true;
+        this.timeSwimmingAway += Time.deltaTime;        
         Vector3 runVector = Vector3.zero;
         foreach (var t in playersAround)
             runVector += (t.transform.position - transform.position).normalized;
@@ -149,7 +151,7 @@ public class Fish : MonoBehaviour {
 
     void Stay()
     {
-        wasStayed = true;
+        this.timeStayed += Time.deltaTime;
         transform.position += transform.forward * Time.deltaTime * fishArea.speed / 20f;
         animator.SetInteger("State", 0);
         if (timer < 0f)
@@ -166,7 +168,7 @@ public class Fish : MonoBehaviour {
     internal void Move()
     {       
         timer -= Time.deltaTime;        
-        lifeTreatment();
+        lifeUpdate();
         switch (state)
         {
             case FStates.Patrol:
@@ -221,7 +223,7 @@ public class Fish : MonoBehaviour {
         {
             target = transform.position;
             fishArea.removeFood();
-            life += UnityEngine.Random.Range(5, 10);
+            life += UnityEngine.Random.Range(5, 15);
             lastState = state;
             state = FStates.Patrol;
         }
