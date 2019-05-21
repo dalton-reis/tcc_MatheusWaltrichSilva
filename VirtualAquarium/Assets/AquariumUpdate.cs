@@ -12,18 +12,37 @@ public class AquariumUpdate : MonoBehaviour {
     public Slider aquariumTemperatureSlider;
     public Text foodCountText;
     public Text hourText;
+    public Text externalTemperatureText;
     public RawImage wheaterImage;
     public Light directionalLight;
     private float accumulatedTime;
+    private float second;
     private DateTime lastFoodHour;
     private float timeChangeWheater;
+    private float timeChangeExternalTemperature;
     private bool isNight;
+    public Texture2D sunImage;
+    public Texture2D sunAndCloudImage;
+    public Texture2D snowImage;
+    public Texture2D rainImage;
+    public Texture2D moonImage;
 
-	// Use this for initialization
-	void Start () {
-        AquariumProperties.currentTimeSpeed = (AquariumProperties.TimeSpeed) AquariumProperties.configs.timeSpeed;
+
+    // Use this for initialization
+    void Start () {
+        if (AquariumProperties.configs != null)
+        {
+            AquariumProperties.currentTimeSpeed = (AquariumProperties.TimeSpeed)AquariumProperties.configs.timeSpeed;
+        } else
+        {
+            AquariumProperties.currentTimeSpeed = AquariumProperties.TimeSpeed.Normal;
+        }        
         AquariumProperties.aquariumTemperature = 25.0f;
+        AquariumProperties.externalTemperature = 25.0f;
+        AquariumProperties.heaterTemperature = 19;
         AquariumProperties.lightIntensity = 2;
+        AquariumProperties.externalLightIntensity = 2;
+        AquariumProperties.sensorLightIntensity = 0;
         AquariumProperties.foodAvailable = 10;
         AquariumProperties.currentWheater = AquariumProperties.Wheater.Sun;
         AquariumProperties.aquariumHour = DateTime.ParseExact("08:00", "HH:mm", CultureInfo.InvariantCulture);
@@ -31,13 +50,13 @@ public class AquariumUpdate : MonoBehaviour {
         switch (AquariumProperties.currentTimeSpeed)
         {
             case AquariumProperties.TimeSpeed.Fast:
-                AquariumProperties.timeSpeedMultiplier = 90;
+                AquariumProperties.timeSpeedMultiplier = 30;
                 break;
             case AquariumProperties.TimeSpeed.Normal:
-                AquariumProperties.timeSpeedMultiplier = 180;
+                AquariumProperties.timeSpeedMultiplier = 60;
                 break;
             case AquariumProperties.TimeSpeed.Slow:
-                AquariumProperties.timeSpeedMultiplier = 600;
+                AquariumProperties.timeSpeedMultiplier = 120;
                 break;
             case AquariumProperties.TimeSpeed.RealTime:
                 AquariumProperties.timeSpeedMultiplier = 3600;
@@ -46,31 +65,37 @@ public class AquariumUpdate : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
-        updateTime();
-        updateHealth();
-        updateFood();
-        updateWheater();
-        updateTemperature();
-        updateLightItensity();
-        updateHealthCoefficient();
+	void Update () {        
+        updateTime();        
 	}
 
     void updateTime()
     {
-        accumulatedTime += Time.deltaTime;
+        Debug.Log(AquariumProperties.aquariumHour);
+        accumulatedTime += Time.deltaTime;        
         if (AquariumProperties.currentTimeSpeed != AquariumProperties.TimeSpeed.RealTime)
         {
             if (accumulatedTime >= AquariumProperties.timeSpeedMultiplier)
-            {
-                AquariumProperties.aquariumHour.AddHours(1);
+            {                
+                AquariumProperties.aquariumHour = AquariumProperties.aquariumHour.AddHours(1);
                 accumulatedTime = 0;
             }
         } else
         {
-            AquariumProperties.aquariumHour.AddSeconds(Time.deltaTime);
-        }        
+            AquariumProperties.aquariumHour = AquariumProperties.aquariumHour.AddSeconds(Time.deltaTime);
+        }
         hourText.text = AquariumProperties.aquariumHour.ToString("HH:ss");
+        second += Time.deltaTime;
+        if (second >= 1)
+        {
+            updateHealth();
+            updateFood();
+            updateWheater();
+            updateTemperature();
+            //updateLightItensity();
+            updateHealthCoefficient();
+            second = 0;
+        }
     }
 
     void updateHealth()
@@ -111,7 +136,7 @@ public class AquariumUpdate : MonoBehaviour {
     void updateWheater()
     {
         isNight = AquariumProperties.aquariumHour >= DateTime.ParseExact("18:30", "HH:mm", CultureInfo.InvariantCulture) && AquariumProperties.aquariumHour <= DateTime.ParseExact("04:59", "HH:mm", CultureInfo.InvariantCulture);
-        timeChangeWheater += Time.deltaTime;
+        timeChangeWheater++;
         if (timeChangeWheater >= AquariumProperties.timeSpeedMultiplier * 4)
         {
             bool acceptable = false;
@@ -132,45 +157,47 @@ public class AquariumUpdate : MonoBehaviour {
             AquariumProperties.currentWheater = (AquariumProperties.Wheater) UnityEngine.Random.Range(0, 4);
             timeChangeWheater = 0;
         }
-        switch (AquariumProperties.currentWheater)
+        timeChangeExternalTemperature++;
+        if (timeChangeExternalTemperature >= AquariumProperties.timeSpeedMultiplier)
         {
-            case AquariumProperties.Wheater.Sun:
-                wheaterImage.texture = Resources.Load<Texture>("sun.png");
-                AquariumProperties.externalTemperature = UnityEngine.Random.Range(32, 43);
-                AquariumProperties.externalLightIntensity = 0.5f;
-                break;
-            case AquariumProperties.Wheater.SunAndCloud:
-                wheaterImage.texture = Resources.Load<Texture>("sun-and-cloud.png");
-                AquariumProperties.externalTemperature = UnityEngine.Random.Range(26, 33);
-                AquariumProperties.externalLightIntensity = 0.3f;
-                break;
-            case AquariumProperties.Wheater.Snow:
-                wheaterImage.texture = Resources.Load<Texture>("snow.png");
-                AquariumProperties.externalTemperature = UnityEngine.Random.Range(-2, 5);
-                AquariumProperties.externalLightIntensity = isNight ? 0.0f : 0.2f;
-                break;
-            case AquariumProperties.Wheater.Rain:
-                wheaterImage.texture = Resources.Load<Texture>("rain.png");
-                AquariumProperties.externalTemperature = UnityEngine.Random.Range(10, 24);
-                AquariumProperties.externalLightIntensity = isNight ? 0.0f : 0.2f;
-                break;
-            case AquariumProperties.Wheater.Moon:
-                wheaterImage.texture = Resources.Load<Texture>("moon.png");
-                AquariumProperties.externalTemperature = UnityEngine.Random.Range(8, 21);
-                AquariumProperties.externalLightIntensity = 0.0f;
-                break;
-        }
+            switch (AquariumProperties.currentWheater)
+            {
+                case AquariumProperties.Wheater.Sun:
+                    wheaterImage.texture = sunImage;
+                    AquariumProperties.externalTemperature = UnityEngine.Random.Range(25, 43);
+                    AquariumProperties.externalLightIntensity = 0.5f;
+                    break;
+                case AquariumProperties.Wheater.SunAndCloud:
+                    wheaterImage.texture = sunAndCloudImage;
+                    AquariumProperties.externalTemperature = UnityEngine.Random.Range(18, 33);
+                    AquariumProperties.externalLightIntensity = 0.3f;
+                    break;
+                case AquariumProperties.Wheater.Snow:
+                    wheaterImage.texture = snowImage;
+                    AquariumProperties.externalTemperature = UnityEngine.Random.Range(-2, 5);
+                    AquariumProperties.externalLightIntensity = isNight ? 0.0f : 0.2f;
+                    break;
+                case AquariumProperties.Wheater.Rain:
+                    wheaterImage.texture = rainImage;
+                    AquariumProperties.externalTemperature = UnityEngine.Random.Range(10, 24);
+                    AquariumProperties.externalLightIntensity = isNight ? 0.0f : 0.2f;
+                    break;
+                case AquariumProperties.Wheater.Moon:
+                    wheaterImage.texture = moonImage;
+                    AquariumProperties.externalTemperature = UnityEngine.Random.Range(8, 21);
+                    AquariumProperties.externalLightIntensity = 0.0f;
+                    break;
+            }
+            externalTemperatureText.text = AquariumProperties.externalTemperature + "ºC";
+            timeChangeExternalTemperature = 0;
+        }                
     }
 
     void updateTemperature()
-    {
-        float heaterAquariumDiff = 0;
-        if (AquariumProperties.heaterTemperature > AquariumProperties.aquariumTemperature)
-        {
-            heaterAquariumDiff = AquariumProperties.heaterTemperature - AquariumProperties.aquariumTemperature;
-        }
+    {       
+        float heaterAquariumDiff = AquariumProperties.heaterTemperature - AquariumProperties.aquariumTemperature;        
         float externalAquariumDiff = AquariumProperties.externalTemperature - AquariumProperties.aquariumTemperature;
-        AquariumProperties.temperatureCoefficient = externalAquariumDiff * 0.02f + heaterAquariumDiff * 0.03f;
+        AquariumProperties.temperatureCoefficient = externalAquariumDiff / (AquariumProperties.timeSpeedMultiplier * 3) + heaterAquariumDiff / ((AquariumProperties.timeSpeedMultiplier * 2.5f));
         AquariumProperties.aquariumTemperature += AquariumProperties.temperatureCoefficient;
         aquariumTemperatureSlider.value = AquariumProperties.aquariumTemperature;
     }
@@ -190,10 +217,10 @@ public class AquariumUpdate : MonoBehaviour {
             temperatureCoefficient = 0;
         } else if (AquariumProperties.aquariumTemperature > AquariumProperties.MAX_TEMPERATURE_SUPPORTED)
         {
-            temperatureCoefficient = (AquariumProperties.MAX_TEMPERATURE_SUPPORTED - AquariumProperties.aquariumTemperature) * 0.03f;
+            temperatureCoefficient = (AquariumProperties.aquariumTemperature - AquariumProperties.MAX_TEMPERATURE_SUPPORTED) * 0.03f;
         } else if (AquariumProperties.aquariumTemperature < AquariumProperties.MIN_TEMPERATURE_SUPPORTED)
         {
-            temperatureCoefficient = (AquariumProperties.aquariumTemperature - AquariumProperties.MIN_TEMPERATURE_SUPPORTED) * 0.03f;
+            temperatureCoefficient = (AquariumProperties.MIN_TEMPERATURE_SUPPORTED - AquariumProperties.aquariumTemperature) * 0.03f;
         }
         float maxLight = isNight ? AquariumProperties.MAX_LIGHT_SUPPORTED_NIGHT : AquariumProperties.MAX_LIGHT_SUPPORTED;
         float minLight = isNight ? AquariumProperties.MIN_LIGHT_SUPPORTED_NIGHT : AquariumProperties.MIN_LIGHT_SUPPORTED;
@@ -207,7 +234,7 @@ public class AquariumUpdate : MonoBehaviour {
         {
             lightCoefficient = (minLight - AquariumProperties.lightIntensity);
         }
-        AquariumProperties.lossLifeCoefficient = lightCoefficient + temperatureCoefficient;
+        AquariumProperties.lossLifeCoefficient = /*lightCoefficient +*/ temperatureCoefficient;
     }
 
     public static void socketCallback(string message)

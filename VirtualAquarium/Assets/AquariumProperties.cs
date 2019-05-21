@@ -17,7 +17,7 @@ public class AquariumProperties : ScriptableObject {
     public static DateTime aquariumHour;
     public static TimeSpeed currentTimeSpeed;
     public static float timeSpeedMultiplier;
-    public static float lifeLostPerHour = 33.3f;
+    public static float lifeLostPerHour = 20.0f;
     public static float temperatureCoefficient;
     public static float lossLifeCoefficient;
     public static float MAX_TEMPERATURE_SUPPORTED = 25.5f;
