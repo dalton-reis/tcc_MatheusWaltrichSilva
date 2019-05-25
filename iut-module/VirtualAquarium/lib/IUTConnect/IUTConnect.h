@@ -12,6 +12,7 @@
 
 class IUTConnect {
   public:
+    IUTConnect();
     void setAccessPointSSID(char* SSID);
     char* getAccessPointSSID();
     void setAccessPointPassword(char* password);
@@ -27,17 +28,18 @@ class IUTConnect {
     void start();
     void start(char* tokenID);
     void start(char* accessPointSSID, char* accessPointPassword, char* tokenID);    
-    void listenSocket();    
+    void listenSocket();
+    bool isWiFi();    
   private:
     void (*socketCallback)(WiFiClient, String);
-    char* accessPointSSID = "IUTConnect";
+    char* accessPointSSID;
     char* accessPointPassword;
     char* tokenID;
     WiFiConnect wifiConn;
     AsyncUDP udpConn;
-    char* multicastIP = "227.55.77.99";
+    char* multicastIP;
     IPAddress deviceIP;
-    unsigned int multicastPort = 5000;
+    unsigned int multicastPort;
     void initializeWiFiConn();
     void initializeMulticast();    
     void handlePacket(AsyncUDPPacket packet);

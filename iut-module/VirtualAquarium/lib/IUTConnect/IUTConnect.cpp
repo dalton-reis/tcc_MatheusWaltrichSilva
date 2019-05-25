@@ -9,6 +9,12 @@ WiFiServer wifiServer(8080);
 String socketData = "";
 WiFiClient client;
 
+IUTConnect::IUTConnect() {
+  this->accessPointSSID = "IUTConnect";
+  this->multicastIP = "227.55.77.99";
+  this->multicastPort = 5000;
+}
+
 void IUTConnect::setAccessPointSSID(char* SSID) {
   this->accessPointSSID = SSID;
 }
@@ -51,6 +57,10 @@ unsigned int IUTConnect::getMulticastPort() {
 
 IPAddress IUTConnect::getDeviceIP() {
   return this->deviceIP;
+}
+
+bool IUTConnect::isWiFi() {
+  return wifiConn.getConnectionType().equals("STA");
 }
 
 void IUTConnect::setSocketCallback(void (*callback)(WiFiClient client, String content)) {
