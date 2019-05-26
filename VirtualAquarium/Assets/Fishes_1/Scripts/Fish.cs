@@ -88,7 +88,7 @@ public class Fish : MonoBehaviour {
 
     void Die()
     {
-        transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * fishArea.speed * 0.3f);
+        transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * fishArea.speed * 0.5f);
         deadTime += Time.deltaTime;
         if (totalRotate < 180)
         {
@@ -223,7 +223,7 @@ public class Fish : MonoBehaviour {
         {
             target = transform.position;
             fishArea.removeFood();
-            life += UnityEngine.Random.Range(5, 15);
+            life += UnityEngine.Random.Range(15, 30);
             lastState = state;
             state = FStates.Patrol;
         }

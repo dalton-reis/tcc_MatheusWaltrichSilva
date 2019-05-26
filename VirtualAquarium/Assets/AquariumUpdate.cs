@@ -80,7 +80,8 @@ public class AquariumUpdate : MonoBehaviour {
             particleFood.Play();
             dropFood = false;
         }
-	}
+        heaterTemperatureText.text = AquariumProperties.heaterTemperature + "ºC";
+    }
 
     void updateTime()
     {        
@@ -104,7 +105,7 @@ public class AquariumUpdate : MonoBehaviour {
             updateFood();
             updateWheater();
             updateTemperature();
-            //updateLightItensity();
+            updateLightItensity();
             updateHealthCoefficient();
             second = 0;
         }
@@ -241,12 +242,12 @@ public class AquariumUpdate : MonoBehaviour {
             lightCoefficient = 0;
         } else if (AquariumProperties.lightIntensity > maxLight)
         {
-            lightCoefficient = (AquariumProperties.lightIntensity - maxLight); 
+            lightCoefficient = (AquariumProperties.lightIntensity - maxLight) * 0.02f; 
         } else if (AquariumProperties.lightIntensity < minLight)
         {
-            lightCoefficient = (minLight - AquariumProperties.lightIntensity);
+            lightCoefficient = (minLight - AquariumProperties.lightIntensity) * 0.02f;
         }
-        AquariumProperties.lossLifeCoefficient = /*lightCoefficient +*/ temperatureCoefficient;
+        AquariumProperties.lossLifeCoefficient = lightCoefficient + temperatureCoefficient;
     }
 
     public void socketCallback(string message)
@@ -259,10 +260,10 @@ public class AquariumUpdate : MonoBehaviour {
         if (tag.Equals("TEMP"))
         {
             AquariumProperties.heaterTemperature = float.Parse(value);
-            heaterTemperatureText.text = AquariumProperties.heaterTemperature + "ºC";
+            
         } else if (tag.Equals("LIGHT"))
         {
-            //AquariumProperties.externalLightIntensity            
+            AquariumProperties.sensorLightIntensity = (100 - float.Parse(value)) * 0.01f;
         } else if (tag.Equals("FOOD") && AquariumProperties.foodAvailable > 0)
         {
             AquariumProperties.foodAvailable--;

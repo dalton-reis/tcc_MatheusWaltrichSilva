@@ -33,7 +33,7 @@ void server(WiFiClient client, String content) {
   Serial.println(botaoValue);
   if (conectado)   {
     digitalWrite(CONECTADO_PIN, HIGH);
-    temperatura = potenciometroValue * 16 / 1023 + 18;  
+    temperatura = potenciometroValue * 100 / 1023;  
     if (temperatura != temperaturaAnterior) {
       client.printf("TEMP|%d\r\n", temperatura);    
       client.println();
@@ -42,7 +42,7 @@ void server(WiFiClient client, String content) {
       temperaturaAnterior = temperatura; 
       delay(500);   
     }
-    luz = ldrValue * 50 / 1023;
+    luz = ldrValue * 100 / 1023;
     if (luz != luzAnterior) {      
       client.printf("LIGHT|%d\r\n", luz);
       client.println();
