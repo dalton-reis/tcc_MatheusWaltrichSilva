@@ -35,29 +35,35 @@ void server(WiFiClient client, String content) {
     digitalWrite(CONECTADO_PIN, HIGH);
     temperatura = potenciometroValue * 16 / 1023 + 18;  
     if (temperatura != temperaturaAnterior) {
-      client.printf("TEMP|%d", temperatura);    
+      client.printf("TEMP|%d\r\n", temperatura);    
+      client.println();
       client.flush();  
       Serial.println(temperatura);
-      temperaturaAnterior = temperatura;    
+      temperaturaAnterior = temperatura; 
+      delay(500);   
     }
     luz = ldrValue * 50 / 1023;
     if (luz != luzAnterior) {      
-      client.printf("LIGHT|%d", luz);
+      client.printf("LIGHT|%d\r\n", luz);
+      client.println();
       client.flush();  
-      Serial.println(luz);
+      Serial.println(luz);    
       luzAnterior = luz;    
+      delay(500);
     }
     comida = botaoValue;
     if (comida == 1023 && comida != comidaAnterior) {
-      client.printf("FOOD|1");
+      client.printf("FOOD|1\r\n");
+      client.println();
       client.flush();        
       comidaAnterior = comida;
+      delay(500);
     } else if (comida == 0) {
       comidaAnterior = comida;
     }
   } else if (content.equals("CONNECTED")) {
     conectado = true;
-    client.println("CONNECTED_TOO");
+    client.println("CONNECTED_TOO\r\n");
     client.flush();
   }
 }

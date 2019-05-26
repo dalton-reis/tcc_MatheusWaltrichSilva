@@ -57,12 +57,13 @@ boolean WiFiConnect::connectWiFi(String wifiConfig) {
   wifiStr.trim();
   String pwdStr = wifiConfig.substring(wifiConfig.indexOf("|")+1);
   pwdStr.trim();  
-  WiFi.begin(wifiStr, pwdStr);
+  WiFi.begin(wifiStr, pwdStr);  
   Serial.println("SSID arquivo: " + wifiStr);
   Serial.println("Password arquivo: " + pwdStr);
+  delay(10000);
   int tries = 0;
-  while (tries < 10 && WiFi.status() != WL_CONNECTED) {
-    delay(3000);
+  while (tries < 3 && WiFi.status() != WL_CONNECTED) {
+    delay(10000);
     WiFi.begin(wifiStr, pwdStr);
     tries++;
   }

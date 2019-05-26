@@ -19,14 +19,15 @@ public class PrincipalPanel : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    private void OnApplicationQuit()
+    {
+        AquariumProperties.conn.stop();
+    }    
 
     void jogarButtonFunc()
     {
         AquariumProperties.conn = new IUTConnect();
-        AquariumProperties.conn.callbackSocket.AddListener(AquariumUpdate.socketCallback);
         AquariumProperties.conn.start(AquariumProperties.configs.token);
         SceneManager.LoadScene(1, LoadSceneMode.Single);
     }

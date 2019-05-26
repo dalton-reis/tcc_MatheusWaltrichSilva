@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +11,7 @@ public class AquariumUpdate : MonoBehaviour {
     public Text foodCountText;
     public Text hourText;
     public Text externalTemperatureText;
+    public Text heaterTemperatureText;
     public RawImage wheaterImage;
     public Light directionalLight;
     private float accumulatedTime;
@@ -26,10 +25,19 @@ public class AquariumUpdate : MonoBehaviour {
     public Texture2D snowImage;
     public Texture2D rainImage;
     public Texture2D moonImage;
+    public ParticleSystem particleFood;
+    private bool dropFood;
 
+
+    private void OnApplicationQuit()
+    {
+        AquariumProperties.conn.stop();
+    }
 
     // Use this for initialization
     void Start () {
+        dropFood = false;
+        AquariumProperties.conn.OnReceive += socketCallback;
         if (AquariumProperties.configs != null)
         {
             AquariumProperties.currentTimeSpeed = (AquariumProperties.TimeSpeed)AquariumProperties.configs.timeSpeed;
@@ -66,12 +74,16 @@ public class AquariumUpdate : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {        
-        updateTime();        
+        updateTime();
+        if (dropFood)
+        {
+            particleFood.Play();
+            dropFood = false;
+        }
 	}
 
     void updateTime()
-    {
-        Debug.Log(AquariumProperties.aquariumHour);
+    {        
         accumulatedTime += Time.deltaTime;        
         if (AquariumProperties.currentTimeSpeed != AquariumProperties.TimeSpeed.RealTime)
         {
@@ -237,14 +249,24 @@ public class AquariumUpdate : MonoBehaviour {
         AquariumProperties.lossLifeCoefficient = /*lightCoefficient +*/ temperatureCoefficient;
     }
 
-    public static void socketCallback(string message)
+    public void socketCallback(string message)
     {
-        string tag = message.Substring(0, message.IndexOf("|"));
-        string value = message.Substring(message.IndexOf("|") + 1);
+        string[] items = message.Split('|');
+        string tag = items[0];
+        string value = items[1];
+        Debug.Log("Tag: " + tag);
+        Debug.Log("Message: " + value);
         if (tag.Equals("TEMP"))
         {
             AquariumProperties.heaterTemperature = float.Parse(value);
-            Debug.Log(AquariumProperties.heaterTemperature);
+            heaterTemperatureText.text = AquariumProperties.heaterTemperature + "ºC";
+        } else if (tag.Equals("LIGHT"))
+        {
+            //AquariumProperties.externalLightIntensity            
+        } else if (tag.Equals("FOOD") && AquariumProperties.foodAvailable > 0)
+        {
+            AquariumProperties.foodAvailable--;
+            dropFood = true;
         }
     }
 }

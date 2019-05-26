@@ -16,13 +16,14 @@ public class IUTConnect
     private UdpClient udpClient;
     IPEndPoint remoteEndPoint;
     IPEndPoint localEndPoint;
-    Socket client;
+    Socket client;    
     private const string CONNECTION_SUCCESSFULL_MESSAGE = "HELLO_DEVICE";
 
     private string multicastIP { get; set; }
     private int multicastPort { get; set; }
     private string tokenID { get; set; }
     public SocketEvent callbackSocket = new SocketEvent();
+    public Action<string> OnReceive = delegate { };
     private string moduleIP;
 
     public IUTConnect()
@@ -43,7 +44,7 @@ public class IUTConnect
         else
         {
             this.moduleIP = sender.Address.ToString();
-            IUTModuleProperties.ModuleAddress = this.moduleIP;
+            IUTModuleProperties.ModuleAddress = this.moduleIP;            
             this.startSocket();
         }
     }
@@ -73,29 +74,27 @@ public class IUTConnect
     }
 
     private void socketCallback(IAsyncResult ar)
-    {
+    {                                
         StateObject state = (StateObject)ar.AsyncState;
         Socket client = state.workSocket;
+        int bytesReceived = client.EndReceive(ar);
 
-        int bytesRead = client.EndReceive(ar);        
-
-        if (bytesRead > 0)
-        {            
-            state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
-            Debug.Log(state.sb.ToString());
-
-            client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(socketCallback), state);
+        if (bytesReceived > 0)
+        {
+            Debug.Log("Bytes received: " + bytesReceived);
+            string message = Encoding.ASCII.GetString(state.buffer, 0, bytesReceived).Trim();            
+            if (!message.Equals(""))
+            {
+                OnReceive(message);
+            }            
         }
         else
         {            
-            if (state.sb.Length > 1)
-            {
-                Debug.Log(state.sb.ToString());
-                callbackSocket.Invoke(state.sb.ToString());
-            }
-            
+            Debug.Log("Resetou");
+            state = new StateObject();
+            state.workSocket = client;            
         }
+        client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(socketCallback), state);
     }
 
     private void receiveSocket()
@@ -116,11 +115,17 @@ public class IUTConnect
     {
         IPAddress moduleIPAddress = IPAddress.Parse(this.moduleIP);
         IPEndPoint moduleEndPoint = new IPEndPoint(moduleIPAddress, 8080);
-        client = new Socket(moduleIPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        client = new Socket(moduleIPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);        
         Debug.Log("Socket Started");
-        client.Connect(moduleEndPoint);
+        client.Connect(moduleEndPoint);       
         this.receiveSocket();        
-        sendSocket("TESTE");
+        sendSocket("CONNECTED");
+    }
+
+    public void stop()
+    {
+        udpClient.Close();
+        client.Close();
     }
 
     public void start(string multicastIP, int multicastPort, string tokenID)

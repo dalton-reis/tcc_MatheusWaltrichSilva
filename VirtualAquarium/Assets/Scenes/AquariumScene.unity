@@ -1688,6 +1688,7 @@ MonoBehaviour:
   foodCountText: {fileID: 2046140030}
   hourText: {fileID: 82708750}
   externalTemperatureText: {fileID: 1816000705}
+  heaterTemperatureText: {fileID: 464294057}
   wheaterImage: {fileID: 392841211}
   directionalLight: {fileID: 1696089025}
   sunImage: {fileID: 2800000, guid: 9dff2ef6a71a47149b78e5dfb770b83f, type: 3}
@@ -1695,6 +1696,7 @@ MonoBehaviour:
   snowImage: {fileID: 2800000, guid: a652aa8e84ec60349af46859814b25c0, type: 3}
   rainImage: {fileID: 2800000, guid: fb0f5ae9b90014c43a22cf67968f60d9, type: 3}
   moonImage: {fileID: 2800000, guid: 45a8b11835d9795488003d7d4774766b, type: 3}
+  particleFood: {fileID: 1939820014}
 --- !u!1 &223587200
 GameObject:
   m_ObjectHideFlags: 0
