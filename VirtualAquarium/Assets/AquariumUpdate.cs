@@ -47,6 +47,9 @@ public class AquariumUpdate : MonoBehaviour {
     public ParticleSystem particleFood;
     public Button sairButton;
     private bool dropFood;
+    private const string DEFAULT_HOUR_MASK = "HH:mm";
+    private DateTime initialNight = DateTime.ParseExact("19:00", DEFAULT_HOUR_MASK, CultureInfo.InvariantCulture);
+    private DateTime finalNight = DateTime.ParseExact("05:00", DEFAULT_HOUR_MASK, CultureInfo.InvariantCulture);
 
 
     private void OnApplicationQuit()
@@ -72,8 +75,8 @@ public class AquariumUpdate : MonoBehaviour {
         AquariumProperties.externalLightIntensity = UnityEngine.Random.Range(0.5f, 1.0f);
         AquariumProperties.foodAvailable = 10;
         AquariumProperties.currentWheater = AquariumProperties.Wheater.Sun;
-        AquariumProperties.aquariumHour = DateTime.ParseExact("08:00", "HH:mm", CultureInfo.InvariantCulture);
-        lastFoodHour = DateTime.ParseExact("08:00", "HH:mm", CultureInfo.InvariantCulture);
+        AquariumProperties.aquariumHour = DateTime.ParseExact("08:00", DEFAULT_HOUR_MASK, CultureInfo.InvariantCulture);
+        lastFoodHour = DateTime.ParseExact("08:00", DEFAULT_HOUR_MASK, CultureInfo.InvariantCulture);
         switch (AquariumProperties.currentTimeSpeed)
         {
             case AquariumProperties.TimeSpeed.Fast:
@@ -116,7 +119,7 @@ public class AquariumUpdate : MonoBehaviour {
         {
             AquariumProperties.aquariumHour = AquariumProperties.aquariumHour.AddSeconds(Time.deltaTime);
         }
-        hourText.text = AquariumProperties.aquariumHour.ToString("HH:ss");
+        hourText.text = AquariumProperties.aquariumHour.ToString(DEFAULT_HOUR_MASK);
         second += Time.deltaTime;
         if (second >= 1)
         {
@@ -166,10 +169,7 @@ public class AquariumUpdate : MonoBehaviour {
     }
 
     void updateWheater()
-    {
-        DateTime initialNight = DateTime.ParseExact("18:30", "HH:mm", CultureInfo.InvariantCulture);
-        DateTime finalNight = DateTime.ParseExact("04:59", "HH:mm", CultureInfo.InvariantCulture);
-
+    {       
         isNight = AquariumProperties.aquariumHour.Hour >= initialNight.Hour || AquariumProperties.aquariumHour.Hour <= finalNight.Hour;
         periodText.text = isNight ? "Noite" : "Dia";
         timeChangeWheater++;
@@ -242,7 +242,23 @@ public class AquariumUpdate : MonoBehaviour {
     {       
         float heaterAquariumDiff = AquariumProperties.heaterTemperature - AquariumProperties.aquariumTemperature;        
         float externalAquariumDiff = AquariumProperties.externalTemperature - AquariumProperties.aquariumTemperature;
-        AquariumProperties.temperatureCoefficient = externalAquariumDiff / (AquariumProperties.timeSpeedMultiplier * 3) + heaterAquariumDiff / ((AquariumProperties.timeSpeedMultiplier * 2.5f));
+        float timeCoefficient = 0;
+        switch (AquariumProperties.currentTimeSpeed)
+        {
+            case AquariumProperties.TimeSpeed.Fast:
+                timeCoefficient = 150;
+                break;
+            case AquariumProperties.TimeSpeed.Normal:
+                timeCoefficient = 180;
+                break;
+            case AquariumProperties.TimeSpeed.RealTime:
+                timeCoefficient = AquariumProperties.timeSpeedMultiplier * 3;
+                break;
+            case AquariumProperties.TimeSpeed.Slow:
+                timeCoefficient = 240;
+                break;
+        }
+        AquariumProperties.temperatureCoefficient = externalAquariumDiff / timeCoefficient + heaterAquariumDiff / ((AquariumProperties.timeSpeedMultiplier * 2.5f));
         AquariumProperties.aquariumTemperature += AquariumProperties.temperatureCoefficient;
         aquariumTemperatureSlider.value = AquariumProperties.aquariumTemperature;
     }

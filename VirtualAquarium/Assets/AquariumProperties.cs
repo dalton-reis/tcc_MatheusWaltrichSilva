@@ -34,6 +34,6 @@ public class AquariumProperties : ScriptableObject {
     }
     public enum Wheater
     {
-        Sun = 0,  SunAndCloud = 1, Moon = 2, Rain = 3, Snow = 4
+        Sun = 0,  SunAndCloud = 1, Snow = 2, Rain = 3, Moon = 4
     }
 }

@@ -20,7 +20,8 @@ public class ConfiguracaoPanel : MonoBehaviour {
         voltarButton.onClick.AddListener(voltarButtonFunc);
         tokenInput.text = AquariumProperties.configs.token;
         SSIDInput.text = AquariumProperties.configs.ssid;
-        PasswordInput.text = AquariumProperties.configs.password;        
+        PasswordInput.text = AquariumProperties.configs.password;
+        speedSlider.value = AquariumProperties.configs.timeSpeed;
     }
 	
 	// Update is called once per frame
@@ -64,6 +65,7 @@ public class ConfiguracaoPanel : MonoBehaviour {
     {
         ConfigProperties configs = new ConfigProperties();
         configs.token = tokenInput.text;
+        configs.timeSpeed = (int) speedSlider.value;
         configs.ssid = SSIDInput.text;
         configs.password = PasswordInput.text;
         configs.moduleIP = IUTModuleProperties.ModuleAddress != null && !"".Equals(IUTModuleProperties.ModuleAddress) ? IUTModuleProperties.ModuleAddress : IUTModuleProperties.DEFAULT_MODULE_ADDRESS;        
@@ -72,6 +74,7 @@ public class ConfiguracaoPanel : MonoBehaviour {
         Debug.Log(route);
         StartCoroutine(sendMessage(route, message));        
         configs.saveConfig();
+        AquariumProperties.configs = configs;
         principalPanel.SetActive(true);
         GameObject.Find("Configuracao_Panel").SetActive(false);        
     }
