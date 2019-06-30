@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class AquariumUpdate : MonoBehaviour {
@@ -8,10 +9,12 @@ public class AquariumUpdate : MonoBehaviour {
     public FishArea fishArea;
     public Slider healthSlider;
     public Slider aquariumTemperatureSlider;
+    public Slider lightingSlider;
     public Text foodCountText;
     public Text hourText;
     public Text externalTemperatureText;
     public Text heaterTemperatureText;
+    public Text periodText;
     public RawImage wheaterImage;
     public Light directionalLight;
     private float accumulatedTime;
@@ -19,13 +22,30 @@ public class AquariumUpdate : MonoBehaviour {
     private DateTime lastFoodHour;
     private float timeChangeWheater;
     private float timeChangeExternalTemperature;
-    private bool isNight;
+    private bool night = false;
+    private bool isNight
+    {
+        get
+        {
+            return night;
+        }
+        set
+        {
+            if (night != value)
+            {
+                night = value;
+                AquariumProperties.currentWheater = (AquariumProperties.Wheater) changeWheater();                
+            }
+            
+        }
+    }
     public Texture2D sunImage;
     public Texture2D sunAndCloudImage;
     public Texture2D snowImage;
     public Texture2D rainImage;
     public Texture2D moonImage;
     public ParticleSystem particleFood;
+    public Button sairButton;
     private bool dropFood;
 
 
@@ -36,6 +56,7 @@ public class AquariumUpdate : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        sairButton.onClick.AddListener(sairButtonFunc);
         dropFood = false;
         AquariumProperties.conn.OnReceive += socketCallback;
         if (AquariumProperties.configs != null)
@@ -47,10 +68,8 @@ public class AquariumUpdate : MonoBehaviour {
         }        
         AquariumProperties.aquariumTemperature = 25.0f;
         AquariumProperties.externalTemperature = 25.0f;
-        AquariumProperties.heaterTemperature = 19;
-        AquariumProperties.lightIntensity = 2;
-        AquariumProperties.externalLightIntensity = 2;
-        AquariumProperties.sensorLightIntensity = 0;
+        AquariumProperties.heaterTemperature = 19;        
+        AquariumProperties.externalLightIntensity = UnityEngine.Random.Range(0.5f, 1.0f);
         AquariumProperties.foodAvailable = 10;
         AquariumProperties.currentWheater = AquariumProperties.Wheater.Sun;
         AquariumProperties.aquariumHour = DateTime.ParseExact("08:00", "HH:mm", CultureInfo.InvariantCulture);
@@ -73,13 +92,13 @@ public class AquariumUpdate : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {        
-        updateTime();
+	void Update () {
         if (dropFood)
         {
             particleFood.Play();
             dropFood = false;
         }
+        updateTime();        
         heaterTemperatureText.text = AquariumProperties.heaterTemperature + "ºC";
     }
 
@@ -148,26 +167,16 @@ public class AquariumUpdate : MonoBehaviour {
 
     void updateWheater()
     {
-        isNight = AquariumProperties.aquariumHour >= DateTime.ParseExact("18:30", "HH:mm", CultureInfo.InvariantCulture) && AquariumProperties.aquariumHour <= DateTime.ParseExact("04:59", "HH:mm", CultureInfo.InvariantCulture);
+        DateTime initialNight = DateTime.ParseExact("18:30", "HH:mm", CultureInfo.InvariantCulture);
+        DateTime finalNight = DateTime.ParseExact("04:59", "HH:mm", CultureInfo.InvariantCulture);
+
+        isNight = AquariumProperties.aquariumHour.Hour >= initialNight.Hour || AquariumProperties.aquariumHour.Hour <= finalNight.Hour;
+        periodText.text = isNight ? "Noite" : "Dia";
         timeChangeWheater++;
         if (timeChangeWheater >= AquariumProperties.timeSpeedMultiplier * 4)
         {
-            bool acceptable = false;
-            do
-            {
-                int wheater = UnityEngine.Random.Range(0, 4);
-                if (isNight && (wheater == 0 || wheater == 1)) 
-                {
-                    acceptable = false;
-                } else if (!isNight && wheater == 4)
-                {
-                    acceptable = false;
-                } else
-                {
-                    acceptable = true;
-                }
-            } while (!acceptable);            
-            AquariumProperties.currentWheater = (AquariumProperties.Wheater) UnityEngine.Random.Range(0, 4);
+            int wheater = changeWheater();            
+            AquariumProperties.currentWheater = (AquariumProperties.Wheater) wheater;
             timeChangeWheater = 0;
         }
         timeChangeExternalTemperature++;
@@ -178,22 +187,22 @@ public class AquariumUpdate : MonoBehaviour {
                 case AquariumProperties.Wheater.Sun:
                     wheaterImage.texture = sunImage;
                     AquariumProperties.externalTemperature = UnityEngine.Random.Range(25, 43);
-                    AquariumProperties.externalLightIntensity = 0.5f;
+                    AquariumProperties.externalLightIntensity = UnityEngine.Random.Range(0.5f, 1.0f);
                     break;
                 case AquariumProperties.Wheater.SunAndCloud:
                     wheaterImage.texture = sunAndCloudImage;
                     AquariumProperties.externalTemperature = UnityEngine.Random.Range(18, 33);
-                    AquariumProperties.externalLightIntensity = 0.3f;
+                    AquariumProperties.externalLightIntensity = UnityEngine.Random.Range(0.3f, 0.6f);
                     break;
                 case AquariumProperties.Wheater.Snow:
                     wheaterImage.texture = snowImage;
                     AquariumProperties.externalTemperature = UnityEngine.Random.Range(-2, 5);
-                    AquariumProperties.externalLightIntensity = isNight ? 0.0f : 0.2f;
+                    AquariumProperties.externalLightIntensity = isNight ? UnityEngine.Random.Range(0.0f, 0.3f) : UnityEngine.Random.Range(0.2f, 0.5f);
                     break;
                 case AquariumProperties.Wheater.Rain:
                     wheaterImage.texture = rainImage;
                     AquariumProperties.externalTemperature = UnityEngine.Random.Range(10, 24);
-                    AquariumProperties.externalLightIntensity = isNight ? 0.0f : 0.2f;
+                    AquariumProperties.externalLightIntensity = isNight ? UnityEngine.Random.Range(0.0f, 0.3f) : UnityEngine.Random.Range(0.2f, 0.5f);
                     break;
                 case AquariumProperties.Wheater.Moon:
                     wheaterImage.texture = moonImage;
@@ -204,6 +213,29 @@ public class AquariumUpdate : MonoBehaviour {
             externalTemperatureText.text = AquariumProperties.externalTemperature + "ºC";
             timeChangeExternalTemperature = 0;
         }                
+    }
+
+    int changeWheater()
+    {
+        bool acceptable = false;
+        int wheater;
+        do
+        {
+            wheater = UnityEngine.Random.Range(0, 4);
+            if (isNight && (wheater == 0 || wheater == 1))
+            {
+                acceptable = false;
+            }
+            else if (!isNight && wheater == 4)
+            {
+                acceptable = false;
+            }
+            else
+            {
+                acceptable = true;
+            }
+        } while (!acceptable);
+        return wheater;
     }
 
     void updateTemperature()
@@ -219,6 +251,7 @@ public class AquariumUpdate : MonoBehaviour {
     {
         AquariumProperties.lightIntensity = AquariumProperties.externalLightIntensity + AquariumProperties.sensorLightIntensity;
         directionalLight.intensity = AquariumProperties.lightIntensity;
+        lightingSlider.value = AquariumProperties.lightIntensity;
     }
 
     void updateHealthCoefficient()
@@ -255,8 +288,8 @@ public class AquariumUpdate : MonoBehaviour {
         string[] items = message.Split('|');
         string tag = items[0];
         string value = items[1];
-        Debug.Log("Tag: " + tag);
-        Debug.Log("Message: " + value);
+        //Debug.Log("Tag: " + tag);
+        //Debug.Log("Message: " + value);
         if (tag.Equals("TEMP"))
         {
             AquariumProperties.heaterTemperature = float.Parse(value);
@@ -269,5 +302,11 @@ public class AquariumUpdate : MonoBehaviour {
             AquariumProperties.foodAvailable--;
             dropFood = true;
         }
+    }
+
+    void sairButtonFunc()
+    {
+        AquariumProperties.conn.stop();
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 }

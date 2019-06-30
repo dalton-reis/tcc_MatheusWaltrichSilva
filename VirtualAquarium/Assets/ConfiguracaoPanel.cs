@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class ConfiguracaoPanel : MonoBehaviour {
 
     public Button confirmarButton;
+    public Button voltarButton;
     public InputField SSIDInput;
     public InputField PasswordInput;
     public GameObject principalPanel;
@@ -15,7 +16,8 @@ public class ConfiguracaoPanel : MonoBehaviour {
     public Text speedText;
     // Use this for initialization
     void Start () {
-        confirmarButton.onClick.AddListener(confirmarButtonFunc);        
+        confirmarButton.onClick.AddListener(confirmarButtonFunc);
+        voltarButton.onClick.AddListener(voltarButtonFunc);
         tokenInput.text = AquariumProperties.configs.token;
         SSIDInput.text = AquariumProperties.configs.ssid;
         PasswordInput.text = AquariumProperties.configs.password;        
@@ -48,7 +50,13 @@ public class ConfiguracaoPanel : MonoBehaviour {
         yield return www.SendWebRequest();
         if (www.isNetworkError || www.isHttpError)
         {
-            Debug.Log(www.error);
+            www = UnityWebRequest.Post("http://192.168.4.1/wifi_config", content);
+            www.SetRequestHeader("Content-Type", "text/plain");
+            yield return www.SendWebRequest();
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
         }
     }
 
@@ -59,13 +67,18 @@ public class ConfiguracaoPanel : MonoBehaviour {
         configs.ssid = SSIDInput.text;
         configs.password = PasswordInput.text;
         configs.moduleIP = IUTModuleProperties.ModuleAddress != null && !"".Equals(IUTModuleProperties.ModuleAddress) ? IUTModuleProperties.ModuleAddress : IUTModuleProperties.DEFAULT_MODULE_ADDRESS;        
-        string route = "http://" + configs.moduleIP + "/wifi_config";
-        route = "http://192.168.4.1/wifi_config";
+        string route = "http://" + configs.moduleIP + "/wifi_config";        
         string message = "ssid=" + configs.ssid + "&password=" + configs.password;
         Debug.Log(route);
         StartCoroutine(sendMessage(route, message));        
         configs.saveConfig();
         principalPanel.SetActive(true);
         GameObject.Find("Configuracao_Panel").SetActive(false);        
-    }        
+    }
+
+    void voltarButtonFunc()
+    {
+        principalPanel.SetActive(true);
+        GameObject.Find("Configuracao_Panel").SetActive(false);
+    }
 }

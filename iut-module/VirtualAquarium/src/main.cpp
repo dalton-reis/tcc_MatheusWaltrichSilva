@@ -21,57 +21,74 @@ int botaoValue = 0;
 int comida = 0;
 int comidaAnterior = 0;
 bool conectado = false;
+bool enviar = false;
 
 MCP3008 adc(CLOCK_PIN, MOSI_PIN, MISO_PIN, CS_PIN);
 
 void server(WiFiClient client, String content) {
-  potenciometroValue = adc.readADC(7); 
-  Serial.println(potenciometroValue);
-  ldrValue = adc.readADC(6);
-  Serial.println(ldrValue);
-  botaoValue = adc.readADC(5);
-  Serial.println(botaoValue);
+  Serial.println(content);
   if (conectado)   {
+    potenciometroValue = adc.readADC(7);   
+    ldrValue = adc.readADC(6);  
+    botaoValue = adc.readADC(5);
     digitalWrite(CONECTADO_PIN, HIGH);
     temperatura = potenciometroValue * 100 / 1023;  
     if (temperatura != temperaturaAnterior) {
-      client.printf("TEMP|%d\r\n", temperatura);    
+      client.printf("TEMP|%d\r\n", temperatura);            
       client.println();
-      client.flush();  
-      Serial.println(temperatura);
-      temperaturaAnterior = temperatura; 
-      delay(500);   
+      enviar = true;      
+      temperaturaAnterior = temperatura;       
     }
     luz = ldrValue * 100 / 1023;
     if (luz != luzAnterior) {      
       client.printf("LIGHT|%d\r\n", luz);
       client.println();
-      client.flush();  
-      Serial.println(luz);    
-      luzAnterior = luz;    
-      delay(500);
+      enviar = true;
+      luzAnterior = luz;          
     }
     comida = botaoValue;
-    if (comida == 1023 && comida != comidaAnterior) {
+    if (comida > 800 && comida != comidaAnterior) {
       client.printf("FOOD|1\r\n");
       client.println();
-      client.flush();        
-      comidaAnterior = comida;
-      delay(500);
+      enviar = true;       
+      comidaAnterior = comida;     
     } else if (comida == 0) {
       comidaAnterior = comida;
     }
-  } else if (content.equals("CONNECTED")) {
+    if (enviar) {      
+      client.flush();
+      delay(500);
+      enviar = false;
+    } else {
+      client.println("HEART_BEAT");
+      client.println();
+      client.flush();
+      delay(150);
+    }    
+  } else if (content.indexOf("CONNECTED") >= 0) {
+    Serial.println("Receive \"CONNECTED\"");
     conectado = true;
     client.println("CONNECTED_TOO\r\n");
+    client.println();
+    delay(500);
     client.flush();
+    Serial.println("Send \"CONNECTED_TOO\"");
+    delay(500);
   }
+}
+
+void resetModulo() {
+  digitalWrite(LIGADO_PIN, LOW);
+  digitalWrite(WIFI_PIN, LOW);
+  digitalWrite(CONECTADO_PIN, LOW);
+  delay(1500);
 }
 
 void setup() {
   pinMode(LIGADO_PIN, OUTPUT);
   pinMode(CONECTADO_PIN, OUTPUT);
   pinMode(WIFI_PIN, OUTPUT);
+  resetModulo();
   char* ssid = "Aquario";
   char* password = "aquario-virtual";
   char* tokenID = "AQUARIUM_01";
@@ -88,5 +105,6 @@ void loop() {
     digitalWrite(WIFI_PIN, LOW);
   }
   digitalWrite(CONECTADO_PIN, LOW);
+  conectado = false;
   IUTConn.listenSocket();  
 }
