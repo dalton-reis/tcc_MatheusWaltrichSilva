@@ -33,15 +33,16 @@ public class PrincipalPanel : MonoBehaviour {
 
     private void OnApplicationQuit()
     {
-        AquariumProperties.conn.stop();
+        //AquariumProperties.conn.stop();
     }    
 
     void jogarButtonFunc()
     {
-        AquariumProperties.conn = new IUTConnect();
-        AquariumProperties.conn.OnConnect += connectCallback;
-        AquariumProperties.conn.start(AquariumProperties.configs.token);
-        connectingText.SetActive(true);
+        //AquariumProperties.conn = new IUTConnect();
+        //AquariumProperties.conn.OnConnect += connectCallback;
+        //AquariumProperties.conn.start(AquariumProperties.configs.token);
+        startSimulator = true;
+        //connectingText.SetActive(true);
     }
 
     void configurarButtonFunc()

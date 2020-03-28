@@ -54,14 +54,14 @@ public class AquariumUpdate : MonoBehaviour {
 
     private void OnApplicationQuit()
     {
-        AquariumProperties.conn.stop();
+        //AquariumProperties.conn.stop();
     }
 
     // Use this for initialization
     void Start () {
         sairButton.onClick.AddListener(sairButtonFunc);
         dropFood = false;
-        AquariumProperties.conn.OnReceive += socketCallback;
+        //AquariumProperties.conn.OnReceive += socketCallback;
         if (AquariumProperties.configs != null)
         {
             AquariumProperties.currentTimeSpeed = (AquariumProperties.TimeSpeed)AquariumProperties.configs.timeSpeed;
@@ -322,7 +322,7 @@ public class AquariumUpdate : MonoBehaviour {
 
     void sairButtonFunc()
     {
-        AquariumProperties.conn.stop();
+        //AquariumProperties.conn.stop();
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 }
