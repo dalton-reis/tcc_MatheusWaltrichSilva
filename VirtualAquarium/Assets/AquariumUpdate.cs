@@ -3,7 +3,8 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+using System.Collections;
+using UnityEngine.XR;
 public class AquariumUpdate : MonoBehaviour {
 
     public FishArea fishArea;
@@ -59,7 +60,11 @@ public class AquariumUpdate : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        
         sairButton.onClick.AddListener(sairButtonFunc);
+        /*LoadVR();
+        XRSettings.enabled = true;
+        Debug.Log("XRSettings.enabled 2: " + XRSettings.enabled.ToString());*/
         dropFood = false;
         //AquariumProperties.conn.OnReceive += socketCallback;
         if (AquariumProperties.configs != null)
@@ -94,8 +99,26 @@ public class AquariumUpdate : MonoBehaviour {
         }
     }
 	
+
+    IEnumerator LoadVR()
+    {        
+        XRSettings.LoadDeviceByName("cardboard");        
+        yield return null;
+        XRSettings.enabled = true;
+        Debug.Log("XRSettings.enabled: " + XRSettings.enabled.ToString());
+        Debug.Log("Device teste: " + XRSettings.loadedDeviceName.ToString());
+    }
+    IEnumerator CloseVR()
+    {        
+        UnityEngine.XR.XRSettings.LoadDeviceByName("None");
+        yield return null;
+        UnityEngine.XR.XRSettings.enabled = false;
+    }
+
 	// Update is called once per frame
 	void Update () {
+        Debug.Log("XRSettings.enabled 2: " + XRSettings.enabled.ToString());
+        Debug.Log("Device: " + XRSettings.loadedDeviceName);
         if (dropFood)
         {
             particleFood.Play();
@@ -324,5 +347,6 @@ public class AquariumUpdate : MonoBehaviour {
     {
         //AquariumProperties.conn.stop();
         SceneManager.LoadScene(0, LoadSceneMode.Single);
+        //StartCoroutine(CloseVR());
     }
 }

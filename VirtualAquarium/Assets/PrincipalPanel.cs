@@ -1,34 +1,41 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.XR;
+using UnityEngine.VR;
 
 public class PrincipalPanel : MonoBehaviour {
 
     public Button jogarButton;
+    public Button jogarRVButton;
     public Button configurarButton;
     public Button sairButton;
     public GameObject configuracaoPanel;
     public GameObject connectingText;
     private bool startSimulator;
+    private bool RV;
 
     // Use this for initialization
     void Start () {        
         AquariumProperties.configs = ConfigProperties.loadConfig();        
         jogarButton.onClick.AddListener(jogarButtonFunc);
+        jogarRVButton.onClick.AddListener(jogarRVButtonFunc);
         configurarButton.onClick.AddListener(configurarButtonFunc);
         sairButton.onClick.AddListener(sairButtonFunc);
+        //StartCoroutine(CloseVR());        
     }
 
     // Update is called once per frame    
     private void Update()
     {
-        if (startSimulator)
+        if (startSimulator && !RV)
         {
-            SceneManager.LoadScene(1, LoadSceneMode.Single);
-        }
+            SceneManager.LoadScene("AquariumScene", LoadSceneMode.Single);
+        } else if (startSimulator && RV){
+            StartCoroutine(LoadVR("MockHMD"));
+            SceneManager.LoadScene("AquariumSceneVR", LoadSceneMode.Single);
+        }        
     }
 
     private void OnApplicationQuit()
@@ -43,6 +50,27 @@ public class PrincipalPanel : MonoBehaviour {
         //AquariumProperties.conn.start(AquariumProperties.configs.token);
         startSimulator = true;
         //connectingText.SetActive(true);
+    }
+
+    void jogarRVButtonFunc()
+    {        
+        startSimulator = true;        
+        RV = true;        
+    }
+
+    IEnumerator LoadVR(string newDevice)
+    {        
+        //XRSettings.LoadDeviceByName("MockHMD");        
+         XRSettings.LoadDeviceByName(newDevice);
+            yield return null;
+            XRSettings.enabled = true;
+    }
+
+    IEnumerator CloseVR()
+    {
+        UnityEngine.XR.XRSettings.LoadDeviceByName("None");
+        yield return null;
+        UnityEngine.XR.XRSettings.enabled = false;
     }
 
     void configurarButtonFunc()
