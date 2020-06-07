@@ -17,13 +17,5 @@ public class CameraSegue : MonoBehaviour
         transform.LookAt(alvo.transform);
         transform.position = cameraposicao.transform.position;
     }
-
-
-    IEnumerator LoadVR()
-    {
-        UnityEngine.XR.XRSettings.LoadDeviceByName("cardboard");
-        yield return null;
-        UnityEngine.XR.XRSettings.enabled = true;
-    }
     
 }
