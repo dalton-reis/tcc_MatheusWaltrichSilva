@@ -512,13 +512,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14ff53d58ab4a5c4eb949eaca1c63fb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 1
-  syncInterval: 0.1
   state: 0
   lastState: 0
   fishArea: {fileID: 0}
-  parede: {fileID: 0}
-  camera: {fileID: 921282253495246257}
+  camerap: {fileID: 921282253495246257}
   cameras: []
   id: 
   identity: {fileID: 114449173087650690}
