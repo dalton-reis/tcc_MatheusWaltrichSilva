@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class Server : MonoBehaviour {
     NetworkManager manager;
+    public GameObject ParedeJogo, ParedeDesenvolvimento;
     public List<Camera> cameras;
     internal GameController gameController;
 
@@ -21,6 +22,13 @@ public class Server : MonoBehaviour {
         }
         if (gameController.multi) {
             manager.StartHost ();
+            if (gameController.CameraDesenvolvimento) {
+                ParedeJogo.SetActive (false);
+                ParedeDesenvolvimento.SetActive (true);
+            } else {
+                ParedeJogo.SetActive (true);
+                ParedeDesenvolvimento.SetActive (false);
+            }
         }
     }
 

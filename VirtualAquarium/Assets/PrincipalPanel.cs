@@ -12,7 +12,7 @@ public class PrincipalPanel : MonoBehaviour {
 
     public InputField Token, Wifi, SenhaWifi, ServidorMult;
 
-    public Toggle IOT, Multiplayer;
+    public Toggle IOT, Multiplayer, CameraDesenvolvimento;
     public Button configurarButton;
     GameController gameController;
     public Button sairButton;
@@ -53,6 +53,7 @@ public class PrincipalPanel : MonoBehaviour {
                         connectingText.gameObject.SetActive (false);
                         gameController.iot = IOT.isOn;
                         gameController.multi = Multiplayer.isOn;
+                        gameController.CameraDesenvolvimento = CameraDesenvolvimento.isOn;
                         gameController.server = ServidorMult.text;
                         SceneManager.LoadScene ("AquariumSceneClient", LoadSceneMode.Single);
                     } else {
@@ -63,6 +64,7 @@ public class PrincipalPanel : MonoBehaviour {
                     connectingText.gameObject.SetActive (false);
                     gameController.iot = IOT.isOn;
                     gameController.multi = Multiplayer.isOn;
+                    gameController.CameraDesenvolvimento = CameraDesenvolvimento.isOn;
                     gameController.server = ServidorMult.text;
                     SceneManager.LoadScene ("AquariumSceneClient", LoadSceneMode.Single);
                 }
@@ -77,6 +79,7 @@ public class PrincipalPanel : MonoBehaviour {
                     connectingText.gameObject.SetActive (false);
                     gameController.iot = IOT.isOn;
                     gameController.multi = Multiplayer.isOn;
+                    gameController.CameraDesenvolvimento = CameraDesenvolvimento.isOn;
                     gameController.server = ServidorMult.text;
                     SceneManager.LoadScene ("AquariumSceneClient", LoadSceneMode.Single);
                 } else {
@@ -86,6 +89,7 @@ public class PrincipalPanel : MonoBehaviour {
             } else {
                 gameController.iot = IOT.isOn;
                 gameController.multi = Multiplayer.isOn;
+                gameController.CameraDesenvolvimento = CameraDesenvolvimento.isOn;
                 gameController.server = ServidorMult.text;
                 SceneManager.LoadScene ("AquariumSceneClient", LoadSceneMode.Single);
             }
@@ -97,6 +101,7 @@ public class PrincipalPanel : MonoBehaviour {
     public void StartSceneVR () {
         gameController.iot = IOT.isOn;
         gameController.multi = Multiplayer.isOn;
+        gameController.CameraDesenvolvimento = CameraDesenvolvimento.isOn;
         gameController.server = ServidorMult.text;
         SceneManager.LoadScene ("AquariumSceneVR", LoadSceneMode.Single);
     }
