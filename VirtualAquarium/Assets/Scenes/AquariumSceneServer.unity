@@ -9084,12 +9084,12 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   manager: {fileID: 0}
+  teste: {fileID: 0}
   backCam: {fileID: 0}
   item:
     back: 
   width: 0
   height: 0
-  t: 
 --- !u!1 &1056826797
 GameObject:
   m_ObjectHideFlags: 0
@@ -11384,6 +11384,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de2163e98e1bf6d47ae96875f6e4bee1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ParedeJogo: {fileID: 0}
+  ParedeDesenvolvimento: {fileID: 0}
   cameras: []
 --- !u!114 &1365920518
 MonoBehaviour:
@@ -11452,7 +11454,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f53a6a7e7cd7884c8628ee21a7cb15f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
+  dontDestroyOnLoad: 0
   runInBackground: 1
   startOnHeadless: 1
   showDebugMessages: 1
@@ -11472,6 +11474,7 @@ MonoBehaviour:
   parede: {fileID: 0}
   canvas: {fileID: 0}
   player: {fileID: 0}
+  gameController: {fileID: 0}
 --- !u!1 &1366417747
 GameObject:
   m_ObjectHideFlags: 0

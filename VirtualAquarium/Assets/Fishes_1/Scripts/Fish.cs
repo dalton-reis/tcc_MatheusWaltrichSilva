@@ -13,7 +13,7 @@ public class Fish : MonoBehaviour {
     List<Transform> playersAround = new List<Transform> ();
     public FishArea fishArea;
     private Vector3 target;
-    public Camera camera;
+    public Camera camerap;
 
     public List<Camera> cameras;
 
@@ -57,10 +57,11 @@ public class Fish : MonoBehaviour {
 
         fishArea = GameObject.FindObjectOfType<FishArea> ();
         if (gameController.multi) {
+            Debug.Log("entrou aqui 2");
             identity = GetComponent<NetworkIdentity> ();
             if (identity.isClient) {
                 id = identity.netId.ToString ();
-                camera.name = "camera_peixe" + id;
+                camerap.name = "camera_peixe" + id;
             }
         }
 
@@ -68,6 +69,7 @@ public class Fish : MonoBehaviour {
 
     private void Update () {
         if (gameController.multi) {
+            Debug.Log("Entrou aqui!");
             if (identity.isClient) {
                 if (identity.isLocalPlayer) {
                     cameras = new List<Camera> (GameObject.FindObjectsOfType<Camera> ());

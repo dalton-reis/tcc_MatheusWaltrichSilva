@@ -91,7 +91,7 @@ public class PrincipalPanel : MonoBehaviour {
                 gameController.multi = Multiplayer.isOn;
                 gameController.CameraDesenvolvimento = CameraDesenvolvimento.isOn;
                 gameController.server = ServidorMult.text;
-                SceneManager.LoadScene ("AquariumSceneClient", LoadSceneMode.Single);
+                SceneManager.LoadScene ("AquariumSceneClient");
             }
 
         }
@@ -103,7 +103,7 @@ public class PrincipalPanel : MonoBehaviour {
         gameController.multi = Multiplayer.isOn;
         gameController.CameraDesenvolvimento = CameraDesenvolvimento.isOn;
         gameController.server = ServidorMult.text;
-        SceneManager.LoadScene ("AquariumSceneVR", LoadSceneMode.Single);
+        SceneManager.LoadScene ("AquariumSceneVR");
     }
 
     void jogarButtonFunc () {

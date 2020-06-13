@@ -1378,7 +1378,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
@@ -6926,7 +6926,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
@@ -9557,7 +9557,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
@@ -9775,7 +9775,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
@@ -10844,7 +10844,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
@@ -11472,7 +11472,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
@@ -13923,7 +13923,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
@@ -14320,7 +14320,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
@@ -15757,7 +15757,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f53a6a7e7cd7884c8628ee21a7cb15f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
+  dontDestroyOnLoad: 0
   runInBackground: 1
   startOnHeadless: 1
   showDebugMessages: 0
@@ -17119,7 +17119,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
@@ -24359,7 +24359,7 @@ MonoBehaviour:
   state: 0
   lastState: 0
   fishArea: {fileID: 1177938168}
-  camera: {fileID: 0}
+  camerap: {fileID: 0}
   cameras: []
   id: 
   identity: {fileID: 0}
