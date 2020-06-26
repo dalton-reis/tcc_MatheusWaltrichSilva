@@ -1,3 +1,5 @@
+
+===> MELHORAR muito.
 __
 Mudar o fundo de tela para uma cor neutra e tirar o s ícones...
 Colocar um aplicativo de fundo com uma cor sólida (paina, etc).
