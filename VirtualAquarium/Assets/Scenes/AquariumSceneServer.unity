@@ -11347,10 +11347,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1365920516}
-  - component: {fileID: 1365920518}
   - component: {fileID: 1365920520}
   - component: {fileID: 1365920519}
   - component: {fileID: 1365920517}
+  - component: {fileID: 1365920518}
   m_Layer: 0
   m_Name: ServerController
   m_TagString: Untagged
