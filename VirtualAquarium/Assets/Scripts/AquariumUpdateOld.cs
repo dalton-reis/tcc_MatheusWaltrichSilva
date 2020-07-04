@@ -74,7 +74,7 @@ public class AquariumUpdateOld : MonoBehaviour {
         if (!fishArea) {
             fishArea = GameObject.FindObjectOfType<FishArea> ();
         }
-        XRSettings.enabled = vrModeEnabled;
+        //XRSettings.enabled = vrModeEnabled;
         sairButton.onClick.AddListener (sairButtonFunc);
         dropFood = false;
 

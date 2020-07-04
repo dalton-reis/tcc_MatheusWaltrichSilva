@@ -8213,6 +8213,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: backgroundOpostaDesenvolvimento
       objectReference: {fileID: 0}
+    - target: {fileID: 3086731676985719938, guid: 32e38602fe123ef408ed4f1a12ccba92,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3086731676985719942, guid: 32e38602fe123ef408ed4f1a12ccba92,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -10381,6 +10386,7 @@ MonoBehaviour:
   manager: {fileID: 0}
   ParedeJogo: {fileID: 951588510}
   ParedeDesenvolvimento: {fileID: 494187224}
+  vrModeEnabled: 1
 --- !u!114 &855213214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11046,6 +11052,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: backgroundOpostaJogo
+      objectReference: {fileID: 0}
+    - target: {fileID: 5755935783328149100, guid: 46b9c4874cfd1b84dbffe978e3de0ac2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 46b9c4874cfd1b84dbffe978e3de0ac2, type: 3}
@@ -24163,6 +24174,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 291765957494006213, guid: 2d1a5a28c9d9fc74697e5c337bff89ef,
+        type: 3}
+      propertyPath: vrModeEnabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8014204560196968887, guid: 2d1a5a28c9d9fc74697e5c337bff89ef,
         type: 3}
       propertyPath: sceneId
